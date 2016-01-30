@@ -1,0 +1,86 @@
+/*
+//  fileio.h
+//
+//  Author:     Pale Purple
+//  Created:    2016. 01. 28. 02:56
+//  Copyright (c) 2016 Pale Purple. All rights reserved.
+//
+//
+*/
+#ifndef _FILEIO_H
+#define _FILEIO_H
+
+#include <stdio.h>
+
+struct listfile;
+struct list;
+struct listitem;
+
+/**
+ * struct listfile - a file saved selected commands
+ *
+ * - description
+ * class for a file to open, write, close.
+ */
+struct listfile {
+    FILE *file;
+};
+
+enum listfile_error {
+    LISTFILE_ERROR_NO_ERROR = 0,
+    LISTFILE_ERROR_NOT_FOUND = 1,
+    LISTFILE_ERROR_NOT_OPENED = 2,
+    LISTFILE_ERROR_FILE_EOF = 3,
+    LISTFILE_ERROR_PARSE_ERROR = 4,
+};
+
+void listfile_init(struct listfile *listfile);
+int listfile_open(struct listfile *listfile, const char *filename);
+int listfile_readline(struct listfile *listfile, struct listitem *item);
+int listfile_write(struct listfile *listfile);
+int listfile_close(struct listfile *listfile);
+void listfile_free(struct listfile *listfile);
+
+/**
+ * struct list - double linked list for items
+ *
+ * descr//
+ */
+struct list {
+    struct list *prev;
+    struct list *next;
+    struct listitem *item;
+};
+
+void list_init(struct list *list);
+struct list* list_append(struct list *list, struct listitem *new_item);
+void list_free(struct list *list);
+
+/**
+ * struct listitem - an item about the command
+ *
+ * - members
+ * cmd      name of command
+ * prio     priority (normal / important / extra).
+ * desc     user description
+ */
+struct listitem {
+    char *cmd;
+    int prio;
+    char *desc;
+};
+
+enum listitem_priority {
+    LISTITEM_IMPORTANT = 0,
+    LISTITEM_NORMAL = 1,
+    LISTITEM_EXTRA = 2
+};
+
+void listitem_init(struct listitem *listitem);
+void listitem_set_cmd(struct listitem *listitem, const char *cmd, int size);
+void listitem_free(struct listitem *listitem);
+
+/* return listitem_priority enum or -1 if error */
+int listitem_to_prio(char ch);
+
+#endif /* _FILEIO_H */

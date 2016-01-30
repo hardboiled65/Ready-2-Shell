@@ -1,0 +1,4 @@
+r2sh
+test/
+*.o
+.sconsign.dblite
