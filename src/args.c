@@ -17,7 +17,7 @@ struct args* parse_args(int argc, char *argv[])
     struct args *args = (struct args*)malloc(sizeof(struct args));
     int i;
 
-    /* TODO: implementation */
+    /* TODO: error handling when '-f' option set but file not specified */
     /* init struct args */
     args->count = argc - 1;
     args->flags = 0;
@@ -37,9 +37,11 @@ struct args* parse_args(int argc, char *argv[])
                 break;
             case ARGS_FILE_PATH_SHORT:
                 args->flags |= FLAGS_INPUT;
+                args->text.in = argv[i + 1];
                 break;
             case ARGS_OUTPUT_SHORT:
                 args->flags |= FLAGS_OUTPUT;
+                args->text.out = argv[i + 1];
                 break;
             case ARGS_PRINT_ALL_SHORT:
                 args->flags |= FLAGS_IMPORTANT;

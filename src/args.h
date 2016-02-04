@@ -113,17 +113,46 @@
 #define is_set_verbose(flags) \
     ((flags) & FLAGS_VERBOSE)
 
+#define is_set_input(flags) \
+    ((flags) & FLAGS_INPUT)
+
+#define is_set_output(flags) \
+    ((flags) & FLAGS_OUTPUT)
+
+struct args;
+struct args_text;
+
+/**
+ * struct args_text - text arguments
+ *
+ * - members
+ * in       input file
+ * out      output file
+ * cmd      command name
+ * prio     priority
+ * desc     description
+ */
+struct args_text {
+    const char *in;
+    const char *out;
+    const char *cmd;
+    const char *prio;
+    const char *desc;
+};
+
 /**
  * struct args - arguments class
  *
  * - members
  * count    options count
  * flags    bit flags of option
+ * text     text arguments such as filename
  * mode     selected operation mode
  */
 struct args {
     int count;
     int flags;
+    struct args_text text;
     int mode;
 };
 

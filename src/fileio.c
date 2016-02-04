@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 /* struct listfile */
 void listfile_init(struct listfile *listfile)
@@ -20,6 +21,11 @@ void listfile_init(struct listfile *listfile)
 
 int listfile_open(struct listfile *listfile, const char *filename)
 {
+    struct stat st;
+    if (stat(filename, &st) != 0) {
+        return LISTFILE_ERROR_NOT_FOUND;
+    }
+
     listfile->file = fopen(filename, "a+");
 
     return LISTFILE_ERROR_NO_ERROR;

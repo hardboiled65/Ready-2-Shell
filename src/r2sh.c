@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     int read_result;
     struct listitem *item;
     struct list *list_it;   /* for print */
+    char *error_str;        /* for perror */
 
     args = parse_args(argc, argv);
 
@@ -74,10 +75,22 @@ int main(int argc, char *argv[])
     /* if mode is print, scan r2shlist file and print results. */
     listfile_init(&listfile);
 
-    listfile_path = (char*)malloc( (sizeof(char) * strlen(getenv("HOME")))
-                                + strlen("/.r2shlist") + 1 );
-    sprintf(listfile_path, "%s/%s", getenv("HOME"), ".r2shlist");
-    listfile_open(&listfile, listfile_path);
+    if ( !(is_set_input(args->flags)) ) {
+        listfile_path = (char*)malloc(sizeof(char) * (strlen(getenv("HOME"))
+                                    + strlen("/.r2shlist") + 1));
+        sprintf(listfile_path, "%s/%s", getenv("HOME"), ".r2shlist");
+    } else {
+        listfile_path = (char*)malloc(sizeof(char) * (strlen(args->text.in)
+                                    + 1));
+        sprintf(listfile_path, "%s", args->text.in);
+    }
+    if (listfile_open(&listfile, listfile_path) != LISTFILE_ERROR_NO_ERROR) {
+        error_str = (char*)malloc(sizeof(char) * (strlen(argv[0]) + strlen(": ")
+                                    + strlen(args->text.in) + 1));
+        sprintf(error_str, "%s: %s", argv[0], args->text.in);
+        perror(error_str);
+        return 1;
+    }
 
     /* create list */
     list = (struct list*)malloc(sizeof(struct list));
