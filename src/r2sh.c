@@ -80,6 +80,11 @@ int main(int argc, char *argv[])
                                     + strlen("/.r2shlist") + 1));
         sprintf(listfile_path, "%s/%s", getenv("HOME"), ".r2shlist");
     } else {
+        /* input flag set but filename missing */
+        if (args->text.in == NULL) {
+            printf("%s: missing filename\n", argv[0]);
+            return 1;
+        }
         listfile_path = (char*)malloc(sizeof(char) * (strlen(args->text.in)
                                     + 1));
         sprintf(listfile_path, "%s", args->text.in);

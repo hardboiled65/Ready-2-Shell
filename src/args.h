@@ -49,7 +49,7 @@
  * true if arg same as longstr
  */
 #define args_compare_long(arg, longstr) \
-    (strcmp((arg) + 2, (longstr)) == 0)
+    (strncmp((arg) + 2, (longstr), strlen(longstr)) == 0)
 
 /**
  * option flags
@@ -140,6 +140,8 @@ struct args_text {
     const char *desc;
 };
 
+void args_text_init(struct args_text *args_text);
+
 /**
  * struct args - arguments class
  *
@@ -172,5 +174,18 @@ enum args_mode {
  * which operation should be executed.
  */
 struct args* parse_args(int argc, char *argv[]);
+
+/**
+ * const char* strip_long_arg(const char *arg, const char *option)
+ *
+ * strip '--option=' from given long option
+ * - parameters
+ * arg      element of argv
+ * option   pre-defined option string
+ * - return value
+ * if available, the function returns the starting position of user argument
+ * value. if unavailable, it returns null pointer
+ */
+const char* strip_long_arg(const char *arg, const char *option);
 
 #endif /* _ARGS_H */

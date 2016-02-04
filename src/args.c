@@ -12,6 +12,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+void args_text_init(struct args_text *args_text)
+{
+    args_text->in = NULL;
+    args_text->out = NULL;
+    args_text->cmd = NULL;
+    args_text->prio = NULL;
+    args_text->desc = NULL;
+}
+
 struct args* parse_args(int argc, char *argv[])
 {
     struct args *args = (struct args*)malloc(sizeof(struct args));
@@ -21,6 +30,7 @@ struct args* parse_args(int argc, char *argv[])
     /* init struct args */
     args->count = argc - 1;
     args->flags = 0;
+    args_text_init(&(args->text));
     args->mode = 0;
 
     /* set flags */
@@ -37,11 +47,11 @@ struct args* parse_args(int argc, char *argv[])
                 break;
             case ARGS_FILE_PATH_SHORT:
                 args->flags |= FLAGS_INPUT;
-                args->text.in = argv[i + 1];
+                if ((i + 1) < argc) args->text.in = argv[i + 1];
                 break;
             case ARGS_OUTPUT_SHORT:
                 args->flags |= FLAGS_OUTPUT;
-                args->text.out = argv[i + 1];
+                if ((i + 1) < argc) args->text.out = argv[i + 1];
                 break;
             case ARGS_PRINT_ALL_SHORT:
                 args->flags |= FLAGS_IMPORTANT;
@@ -77,8 +87,10 @@ struct args* parse_args(int argc, char *argv[])
                     args->flags |= FLAGS_VERSION;
                 } else if (args_compare_long(argv[i], ARGS_FILE_PATH_LONG)) {
                     args->flags |= FLAGS_INPUT;
+                    args->text.in = strip_long_arg(argv[i], ARGS_FILE_PATH_LONG);
                 } else if (args_compare_long(argv[i], ARGS_OUTPUT_LONG)) {
                     args->flags |= FLAGS_OUTPUT;
+                    args->text.out = strip_long_arg(argv[i], ARGS_OUTPUT_LONG);
                 } else if (args_compare_long(argv[i], ARGS_PRINT_ALL_LONG)) {
                     args->flags |= FLAGS_IMPORTANT;
                     args->flags |= FLAGS_NORMAL;
@@ -119,4 +131,18 @@ struct args* parse_args(int argc, char *argv[])
     }
 
     return args;
+}
+
+const char* strip_long_arg(const char *arg, const char *option)
+{
+    /**
+     * '+ 3' for "--" and "="
+     * if arg only "--option="(equal to '+3') or "--option"(less than '+3'),
+     * it will returns null ptr
+     */
+    if (strlen(arg) > strlen(option) + 3) {
+        return arg + (strlen(option) + 3);
+    } else {
+        return NULL;
+    }
 }
