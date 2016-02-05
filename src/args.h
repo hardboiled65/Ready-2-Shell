@@ -168,6 +168,9 @@ enum args_mode {
     ARGS_EDIT = 3,
 };
 
+void args_init(struct args *args);
+void args_set_mode(struct args *args);
+
 /**
  * struct args* parse_args(int, char**)
  *

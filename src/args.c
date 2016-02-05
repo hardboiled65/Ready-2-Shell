@@ -21,6 +21,28 @@ void args_text_init(struct args_text *args_text)
     args_text->desc = NULL;
 }
 
+void args_init(struct args *args)
+{
+    args->count = 0;
+    args->flags = 0;
+    args->wrong = -1;
+    args_text_init(&(args->text));
+    args->mode = 0;
+}
+
+void args_set_mode(struct args *args)
+{
+    if (is_print_mode(args->flags)) {
+        args->mode = ARGS_PRINT;
+    } else if (is_help_mode(args->flags)) {
+        args->mode = ARGS_HELP;
+    } else if (is_version_mode(args->flags)) {
+        args->mode = ARGS_VERSION;
+    } else if (is_edit_mode(args->flags)) {
+        args->mode = ARGS_EDIT;
+    }
+}
+
 struct args* parse_args(int argc, char *argv[])
 {
     struct args *args = (struct args*)malloc(sizeof(struct args));
@@ -28,11 +50,8 @@ struct args* parse_args(int argc, char *argv[])
 
     /* TODO: error handling when '-f' option set but file not specified */
     /* init struct args */
+    args_init(args);
     args->count = argc - 1;
-    args->flags = 0;
-    args->wrong = -1;
-    args_text_init(&(args->text));
-    args->mode = 0;
 
     /* set flags */
     for (i = 1; i < argc; ++i) {
@@ -126,15 +145,7 @@ struct args* parse_args(int argc, char *argv[])
     }
 
     /* set mode */
-    if (is_print_mode(args->flags)) {
-        args->mode = ARGS_PRINT;
-    } else if (is_help_mode(args->flags)) {
-        args->mode = ARGS_HELP;
-    } else if (is_version_mode(args->flags)) {
-        args->mode = ARGS_VERSION;
-    } else if (is_edit_mode(args->flags)) {
-        args->mode = ARGS_EDIT;
-    }
+    args_set_mode(args);
 
     return args;
 }
