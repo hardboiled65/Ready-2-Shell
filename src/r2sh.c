@@ -61,6 +61,11 @@ int main(int argc, char *argv[])
 
     args = parse_args(argc, argv);
 
+    /* print error and return error code when wrong position set */
+    if (args->wrong != -1) {
+        printf("%s: invalid option '%s'\n", argv[0], argv[args->wrong]);
+        return 1;
+    }
     /* print help and exit if mode is help */
     if (args->mode == ARGS_HELP) {
         printf("help\n");

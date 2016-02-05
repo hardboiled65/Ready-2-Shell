@@ -30,6 +30,7 @@ struct args* parse_args(int argc, char *argv[])
     /* init struct args */
     args->count = argc - 1;
     args->flags = 0;
+    args->wrong = -1;
     args_text_init(&(args->text));
     args->mode = 0;
 
@@ -103,9 +104,14 @@ struct args* parse_args(int argc, char *argv[])
                     args->flags |= FLAGS_EXTRA;
                 } else if (args_compare_long(argv[i], ARGS_PRINT_VERBOSE_LONG)) {
                     args->flags |= FLAGS_VERBOSE;
+                } else {
+                    /* wrong option position set if not match any options */
+                    args->wrong = i;
                 }
                 break;
             default:
+                /* wrong option position set if not match any short options */
+                args->wrong = i;
                 break;
             } /* switch */
         /* argument is a suboption */

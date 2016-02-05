@@ -148,12 +148,15 @@ void args_text_init(struct args_text *args_text);
  * - members
  * count    options count
  * flags    bit flags of option
+ * wrong    position of wrong(invalid) option in argv
+ *          -1 for nothing wrong
  * text     text arguments such as filename
  * mode     selected operation mode
  */
 struct args {
     int count;
     int flags;
+    int wrong;
     struct args_text text;
     int mode;
 };
