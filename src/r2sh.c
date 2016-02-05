@@ -15,6 +15,7 @@
 
 #include "args.h"
 #include "fileio.h"
+#include "information.h"
 
 int check_command(const char *cmd)
 {
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
     }
     /* print help and exit if mode is help */
     if (args->mode == ARGS_HELP) {
-        printf("help\n");
+        printf("%s", INFORMATION_HELP);
         return 0;
     }
     /* print version and exit if mode is version */
