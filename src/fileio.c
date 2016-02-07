@@ -98,9 +98,35 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     return LISTFILE_ERROR_NO_ERROR;
 }
 
-int listfile_write(struct listfile *listfile)
+int listfile_writeln(struct listfile *listfile, struct listitem *item)
 {
-    /* write to file */
+    char *prio_char;
+
+    /* write an item to file */
+    printf("item->cmd: %s\n", item->cmd);
+    fputs(item->cmd, listfile->file);
+    fputs("\t", listfile->file);
+
+    switch (item->prio) {
+    case LISTITEM_IMPORTANT:
+        prio_char = "i";
+        break;
+    case LISTITEM_NORMAL:
+        prio_char = "n";
+        break;
+    case LISTITEM_EXTRA:
+        prio_char = "e";
+        break;
+    default:
+        break;
+    }
+    printf("prio_char: %s\n", prio_char);
+    fputs(prio_char, listfile->file);
+    fputs("\t", listfile->file);
+
+    printf("item->desc: %s\n", item->desc);
+    fputs(item->desc, listfile->file);
+    fputs("\n", listfile->file);
 
     return LISTFILE_ERROR_NO_ERROR;
 }

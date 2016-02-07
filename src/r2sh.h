@@ -14,9 +14,14 @@
 /*                     24 -> |__________  ____________| */
 #define COMMAND_FORMAT_LEN  24
 
+struct args;
+struct listfile;
 struct listitem;
 
 int check_command(const char *cmd);
 void print(struct listitem *item, int flags);
+void add_mode(struct listfile *listfile, struct args *args);
+void modify_mode();
+void delete_mode();
 
 #endif /* _R2SH_H */

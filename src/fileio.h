@@ -38,6 +38,7 @@ void listfile_init(struct listfile *listfile);
 int listfile_open(struct listfile *listfile, const char *filename);
 int listfile_readline(struct listfile *listfile, struct listitem *item);
 int listfile_write(struct listfile *listfile);
+int listfile_writeln(struct listfile *listfile, struct listitem *item);
 int listfile_close(struct listfile *listfile);
 void listfile_free(struct listfile *listfile);
 

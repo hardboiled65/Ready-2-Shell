@@ -99,6 +99,21 @@ struct args* parse_args(int argc, char *argv[])
             case ARGS_EDIT_DELETE_SHORT:
                 args->flags |= FLAGS_DELETE;
                 break;
+            case ARGS_EDIT_COMMAND:
+                if ( ((i + 1) < argc) && (argv[i + 1][0] != '-') ) {
+                    args->text.cmd = argv[i + 1];
+                }
+                break;
+            case ARGS_EDIT_PRIORITY:
+                if ( ((i + 1) < argc) && (argv[i + 1][0] != '-') ) {
+                    args->text.prio = argv[i + 1];
+                }
+                break;
+            case ARGS_EDIT_DESCRIPTION:
+                if ( ((i + 1) < argc) && (argv[i + 1][0] != '-') ) {
+                    args->text.desc = argv[i + 1];
+                }
+                break;
             /* long options */
             case '-':
                 if (args_compare_long(argv[i], ARGS_HELP_LONG)) {
