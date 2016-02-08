@@ -24,4 +24,14 @@ void add_mode(struct listfile *listfile, struct args *args);
 void modify_mode();
 void delete_mode();
 
+/**
+ * console_input_s(char* dst, int size)
+ *
+ * read a line from console input, and leftovers are stripped
+ * - parameters
+ * dst      destination char pointer that input string stored
+ * size     maximum read size
+ */
+void console_input_s(char *dst, int size);
+
 #endif /* _R2SH_H */

@@ -59,34 +59,29 @@ void add_mode(struct listfile *listfile, struct args *args)
     /* check which argument is not passed and ask to input */
     if (args->text.cmd == NULL) {
         printf("command: ");
-        fgets(cmd_input, 1024, stdin);
+        console_input_s(cmd_input, 1024);
         /* TODO: if input nothing, show input prompt again */
-        if (cmd_input[strlen(cmd_input) - 1] == '\n') {
-            cmd_input[strlen(cmd_input) - 1] = '\0';
+        while (strlen(cmd_input) == 0) {
+            printf("command: ");
+            console_input_s(cmd_input, 1024);
         }
         args->text.cmd = cmd_input;
     }
     if (args->text.prio == NULL) {
         printf("priority [0: important / 1: normal / 2: extra]: (1) ");
-        fgets(prio_input, 3, stdin);
+        console_input_s(prio_input, 2);
         /* default is normal(1) */
         if (prio_input[0] == '\n') {
             strcpy(prio_input, "1");
-        }
-        if (prio_input[1] == '\n') {
-            prio_input[1] = '\0';
         }
         args->text.prio = prio_input;
     }
     if (args->text.desc == NULL) {
         printf("description: () ");
-        fgets(desc_input, 2048, stdin);
+        console_input_s(desc_input, 2048);
         /* default is "" */
         if (desc_input[0] == '\n') {
             strcpy(desc_input, "");
-        }
-        if (desc_input[strlen(desc_input) - 1] == '\n') {
-            desc_input[strlen(desc_input) - 1] = '\0';
         }
         args->text.desc = desc_input;
     }
@@ -103,6 +98,43 @@ void add_mode(struct listfile *listfile, struct args *args)
         item.prio = LISTITEM_EXTRA;
     }
     listfile_writeln(listfile, &item);
+}
+
+/*
+void console_input(char *dst, int size)
+{
+    size_t str_len;
+    int read_len = 0;
+
+    fgets(dst, size, stdin);
+    str_len = strlen(dst);
+
+    if (dst[str_len - 1] == '\n') {
+        dst[str_len - 1] = '\0';
+    }
+    read_len = str_len;
+}
+*/
+
+void console_input_s(char *dst, int size)
+{
+    char buf;
+    int i;
+
+    for (i = 0; i < size; ++i) {
+        buf = fgetc(stdin);
+        if (buf != '\n') {
+            dst[i] = buf;
+        } else {
+            dst[i] = '\0';
+            break;
+        }
+    }
+    /* if not encountered to newline, discard characters in buffer */
+    if (i == size) {
+        dst[size - 1] = '\0';
+        while (fgetc(stdin) != '\n') {}
+    }
 }
 
 int main(int argc, char *argv[])
