@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 struct listfile;
+struct lines;
 struct list;
 struct listitem;
 
@@ -24,6 +25,7 @@ struct listitem;
  */
 struct listfile {
     FILE *file;
+    struct lines *lines;
 };
 
 enum listfile_error {
@@ -36,11 +38,30 @@ enum listfile_error {
 
 void listfile_init(struct listfile *listfile);
 int listfile_open(struct listfile *listfile, const char *filename);
+int listfile_read(struct listfile *listfile);
 int listfile_readline(struct listfile *listfile, struct listitem *item);
 int listfile_write(struct listfile *listfile);
 int listfile_writeln(struct listfile *listfile, struct listitem *item);
 int listfile_close(struct listfile *listfile);
 void listfile_free(struct listfile *listfile);
+
+/**
+ * struct lines - store data of file line by line
+ *
+ * - members
+ * num          number of lines
+ * alloc_size   allocated size of array
+ * data         array to line data
+ */
+struct lines {
+    int num;
+    int alloc_size;
+    char **data;
+};
+
+void lines_init(struct lines *lines);
+void lines_append(struct lines *lines, char *line_str);
+void lines_free(struct lines *lines);
 
 /**
  * struct list - double linked list for items

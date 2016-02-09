@@ -17,6 +17,7 @@
 void listfile_init(struct listfile *listfile)
 {
     listfile->file = NULL;
+    lines_init(listfile->lines);
 }
 
 int listfile_open(struct listfile *listfile, const char *filename)
@@ -27,6 +28,42 @@ int listfile_open(struct listfile *listfile, const char *filename)
     }
 
     listfile->file = fopen(filename, "a+");
+
+    return LISTFILE_ERROR_NO_ERROR;
+}
+
+int listfile_read(struct listfile *listfile)
+{
+    char buf;
+    int file_offset = 0;
+    char *temp;
+
+    if (listfile->file == NULL) {
+        return LISTFILE_ERROR_NOT_OPENED;
+    }
+    if (feof(listfile->file)) {
+        return LISTFILE_ERROR_FILE_EOF;
+    }
+
+    while ((buf = fgetc(listfile->file)) != EOF) {
+        printf("[%c]", buf);
+        ++file_offset;
+        /* count characters of the line */
+        while (buf != '\n') {
+            buf = fgetc(listfile->file);
+            printf("[%c]", buf);
+            ++file_offset;
+        }
+        /* rewind to begin of the line */
+        fseek(listfile->file, -file_offset, SEEK_CUR);
+        /* read to memory */
+        temp = (char*)malloc((sizeof(char) * file_offset) + 1);
+        fgets(temp, file_offset, listfile->file);
+        lines_append(listfile->lines, temp);
+
+        fgetc(listfile->file);
+        file_offset = 0;
+    }
 
     return LISTFILE_ERROR_NO_ERROR;
 }
@@ -149,6 +186,41 @@ void listfile_free(struct listfile *listfile)
         free(listfile->file);
         listfile->file = NULL;
     }
+}
+
+/* struct lines */
+void lines_init(struct lines *lines)
+{
+    const int default_size = 50;
+
+    lines->num = 0;
+    lines->data = (char**)malloc(sizeof(char*) * default_size);
+    lines->alloc_size = default_size;
+}
+
+void lines_append(struct lines *lines, char *line_str)
+{
+    char **new_data;
+    int i;
+
+    if (lines->num < lines->alloc_size) {
+        lines->data[lines->num] = line_str;
+    } else {
+        new_data = (char**)malloc(sizeof(char*) * lines->alloc_size + 1);
+        for (i = 0; i < lines->num; ++i) {
+            new_data[i] = lines->data[i];
+        }
+        new_data[lines->alloc_size++] = line_str;
+        free(lines->data);
+        lines->data = new_data;
+    }
+    lines->num += 1;
+}
+
+void lines_free(struct lines *lines)
+{
+    /* TODO: free whole line data */
+    lines->data = NULL;
 }
 
 /* struct list */
