@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "args.h"
+#include "cmditem.h"
 #include "fileio.h"
 #include "information.h"
 
