@@ -150,7 +150,8 @@ int listfile_write(struct listfile *listfile, const char *filename)
     num = listfile->lines->num;
     for (i = 0; i < num; ++i) {
         if (listfile->lines->data[i] != NULL) {
-            fputs(listfile->lines->data[i], listfile->w_file);
+            fputs(listfile->lines->data[i], listfile->file);
+            fputs("\n", listfile->file);
         }
     }
 
