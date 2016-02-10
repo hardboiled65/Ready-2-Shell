@@ -148,6 +148,7 @@ int listfile_write(struct listfile *listfile)
     for (i = 0; i < num; ++i) {
         if (listfile->lines->data[i] != NULL) {
             fputs(listfile->lines->data[i], listfile->file);
+            fputs("\n", listfile->file);
         }
     }
 
