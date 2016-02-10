@@ -17,6 +17,7 @@
 void listfile_init(struct listfile *listfile)
 {
     listfile->file = NULL;
+    listfile->w_file = NULL;
     lines_init(listfile->lines);
 }
 
@@ -135,19 +136,21 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     return LISTFILE_ERROR_NO_ERROR;
 }
 
-int listfile_write(struct listfile *listfile)
+int listfile_write(struct listfile *listfile, const char *filename)
 {
     int num;
     int i;
 
-    if (listfile->file == NULL) {
+    listfile->w_file = fopen(filename, "w");
+
+    if (listfile->w_file == NULL) {
         return LISTFILE_ERROR_NOT_OPENED;
     }
 
     num = listfile->lines->num;
     for (i = 0; i < num; ++i) {
         if (listfile->lines->data[i] != NULL) {
-            fputs(listfile->lines->data[i], listfile->file);
+            fputs(listfile->lines->data[i], listfile->w_file);
         }
     }
 
