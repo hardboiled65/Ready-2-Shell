@@ -135,6 +135,25 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     return LISTFILE_ERROR_NO_ERROR;
 }
 
+int listfile_write(struct listfile *listfile)
+{
+    int num;
+    int i;
+
+    if (listfile->file == NULL) {
+        return LISTFILE_ERROR_NOT_OPENED;
+    }
+
+    num = listfile->lines->num;
+    for (i = 0; i < num; ++i) {
+        if (listfile->lines->data[i] != NULL) {
+            fputs(listfile->lines->data[i], listfile->file);
+        }
+    }
+
+    return LISTFILE_ERROR_NO_ERROR;
+}
+
 int listfile_writeln(struct listfile *listfile, struct listitem *item)
 {
     char *prio_char;
@@ -170,14 +189,15 @@ int listfile_writeln(struct listfile *listfile, struct listitem *item)
 
 int listfile_close(struct listfile *listfile)
 {
+    if (listfile->file == NULL) {
+        return LISTFILE_ERROR_NOT_OPENED;
+    }
+
     if (listfile->file != NULL) {
         fclose(listfile->file);
         listfile->file = NULL;
-
-        return LISTFILE_ERROR_NO_ERROR;
-    } else {
-        return LISTFILE_ERROR_NOT_OPENED;
     }
+    return LISTFILE_ERROR_NO_ERROR;
 }
 
 void listfile_free(struct listfile *listfile)
