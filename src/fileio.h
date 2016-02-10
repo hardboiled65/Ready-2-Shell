@@ -24,7 +24,7 @@ struct listitem;
  * class for a file to open, write, close.
  */
 struct listfile {
-    FILE *file;
+    FILE *r_file;
     FILE *w_file;
     struct lines *lines;
 };

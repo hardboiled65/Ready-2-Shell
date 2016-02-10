@@ -16,7 +16,7 @@
 /* struct listfile */
 void listfile_init(struct listfile *listfile)
 {
-    listfile->file = NULL;
+    listfile->r_file = NULL;
     listfile->w_file = NULL;
     lines_init(listfile->lines);
 }
@@ -28,7 +28,7 @@ int listfile_open(struct listfile *listfile, const char *filename)
         return LISTFILE_ERROR_NOT_FOUND;
     }
 
-    listfile->file = fopen(filename, "a+");
+    listfile->r_file = fopen(filename, "a+");
 
     return LISTFILE_ERROR_NO_ERROR;
 }
@@ -39,30 +39,30 @@ int listfile_read(struct listfile *listfile)
     int file_offset = 0;
     char *temp;
 
-    if (listfile->file == NULL) {
+    if (listfile->r_file == NULL) {
         return LISTFILE_ERROR_NOT_OPENED;
     }
-    if (feof(listfile->file)) {
+    if (feof(listfile->r_file)) {
         return LISTFILE_ERROR_FILE_EOF;
     }
 
-    while ((buf = fgetc(listfile->file)) != EOF) {
+    while ((buf = fgetc(listfile->r_file)) != EOF) {
         printf("[%c]", buf);
         ++file_offset;
         /* count characters of the line */
         while (buf != '\n') {
-            buf = fgetc(listfile->file);
+            buf = fgetc(listfile->r_file);
             printf("[%c]", buf);
             ++file_offset;
         }
         /* rewind to begin of the line */
-        fseek(listfile->file, -file_offset, SEEK_CUR);
+        fseek(listfile->r_file, -file_offset, SEEK_CUR);
         /* read to memory */
         temp = (char*)malloc((sizeof(char) * file_offset) + 1);
-        fgets(temp, file_offset, listfile->file);
+        fgets(temp, file_offset, listfile->r_file);
         lines_append(listfile->lines, temp);
 
-        fgetc(listfile->file);
+        fgetc(listfile->r_file);
         file_offset = 0;
     }
 
@@ -79,26 +79,26 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     }
     
     /* read a line and write to the item */
-    if ((buf = fgetc(listfile->file)) == EOF) {
+    if ((buf = fgetc(listfile->r_file)) == EOF) {
         return LISTFILE_ERROR_FILE_EOF;
     }
     ++file_offset;
     /* read command */
     while (buf != ' ' && buf != '\t') {
-        buf = fgetc(listfile->file);
+        buf = fgetc(listfile->r_file);
         ++file_offset;
     }
     /* rewind to begin of the command name */
-    fseek(listfile->file, -file_offset, SEEK_CUR);
+    fseek(listfile->r_file, -file_offset, SEEK_CUR);
     /* write command to item */
     item->cmd = (char*)malloc(sizeof(char*) * file_offset);
-    fscanf(listfile->file, "%s", item->cmd);
+    fscanf(listfile->r_file, "%s", item->cmd);
     /* when after fscanf, seek goes last character of word that read */
 
     /* discard spaces or tabs */
-    buf = fgetc(listfile->file);
+    buf = fgetc(listfile->r_file);
     while (buf == ' ' || buf == '\t') {
-        buf = fgetc(listfile->file);
+        buf = fgetc(listfile->r_file);
     }
 
     /* read priority */
@@ -108,9 +108,9 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     }
 
     /* discard spaces or tabs or a newline */
-    buf = fgetc(listfile->file);
+    buf = fgetc(listfile->r_file);
     while (buf == ' ' || buf == '\t') {
-        buf = fgetc(listfile->file);
+        buf = fgetc(listfile->r_file);
     }
     /* return immediately when no description */
     if (buf == '\n' || buf == EOF) {
@@ -121,17 +121,17 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     file_offset = 0;
     ++file_offset;
     while (buf != '\n' && buf != EOF) {
-        buf = fgetc(listfile->file);
+        buf = fgetc(listfile->r_file);
         ++file_offset;
     }
     /* rewind to begin of the description */
-    fseek(listfile->file, -file_offset, SEEK_CUR);
+    fseek(listfile->r_file, -file_offset, SEEK_CUR);
     /* write to item */
     item->desc = (char*)malloc(sizeof(char) * file_offset);
-    fscanf(listfile->file, "%[^\n]", item->desc);
+    fscanf(listfile->r_file, "%[^\n]", item->desc);
 
     /* move indicator to newline for next read */
-    fgetc(listfile->file);
+    fgetc(listfile->r_file);
 
     return LISTFILE_ERROR_NO_ERROR;
 }
@@ -150,8 +150,8 @@ int listfile_write(struct listfile *listfile, const char *filename)
     num = listfile->lines->num;
     for (i = 0; i < num; ++i) {
         if (listfile->lines->data[i] != NULL) {
-            fputs(listfile->lines->data[i], listfile->file);
-            fputs("\n", listfile->file);
+            fputs(listfile->lines->data[i], listfile->w_file);
+            fputs("\n", listfile->w_file);
         }
     }
 
@@ -164,8 +164,8 @@ int listfile_writeln(struct listfile *listfile, struct listitem *item)
 
     /* write an item to file */
     printf("item->cmd: %s\n", item->cmd);
-    fputs(item->cmd, listfile->file);
-    fputs("\t", listfile->file);
+    fputs(item->cmd, listfile->r_file);
+    fputs("\t", listfile->r_file);
 
     switch (item->prio) {
     case LISTITEM_IMPORTANT:
@@ -181,34 +181,42 @@ int listfile_writeln(struct listfile *listfile, struct listitem *item)
         break;
     }
     printf("prio_char: %s\n", prio_char);
-    fputs(prio_char, listfile->file);
-    fputs("\t", listfile->file);
+    fputs(prio_char, listfile->r_file);
+    fputs("\t", listfile->r_file);
 
     printf("item->desc: %s\n", item->desc);
-    fputs(item->desc, listfile->file);
-    fputs("\n", listfile->file);
+    fputs(item->desc, listfile->r_file);
+    fputs("\n", listfile->r_file);
 
     return LISTFILE_ERROR_NO_ERROR;
 }
 
 int listfile_close(struct listfile *listfile)
 {
-    if (listfile->file == NULL) {
+    if (listfile->r_file == NULL && listfile->w_file == NULL) {
         return LISTFILE_ERROR_NOT_OPENED;
     }
 
-    if (listfile->file != NULL) {
-        fclose(listfile->file);
-        listfile->file = NULL;
+    if (listfile->r_file != NULL) {
+        fclose(listfile->r_file);
+        listfile->r_file = NULL;
+    }
+    if (listfile->w_file != NULL) {
+        fclose(listfile->w_file);
+        listfile->w_file = NULL;
     }
     return LISTFILE_ERROR_NO_ERROR;
 }
 
 void listfile_free(struct listfile *listfile)
 {
-    if (listfile->file != NULL) {
-        free(listfile->file);
-        listfile->file = NULL;
+    if (listfile->r_file != NULL) {
+        free(listfile->r_file);
+        listfile->r_file = NULL;
+    }
+    if (listfile->w_file != NULL) {
+        free(listfile->w_file);
+        listfile->w_file = NULL;
     }
 }
 
