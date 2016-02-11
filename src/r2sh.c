@@ -101,6 +101,37 @@ void add_mode(struct listfile *listfile, struct args *args)
     listfile_writeln(listfile, &item);
 }
 
+void modify_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem)
+{
+    char prio_input[3];
+    char desc_input[2048];
+
+    /* print error message if command not specified */
+    if (args->text.cmd == NULL) {
+        printf("error: command not selected\n");
+        return;
+    }
+    /* show and input new information */
+    if (args->text.prio == NULL) {
+        printf("priority [0: important / 1: normal / 2: extra]: (%d) ",
+                cmditem_find(cmditem, args->text.cmd)->prio);
+        console_input_s(prio_input, 2);
+        if (strcmp(prio_input, "") != 0) {
+            args->text.prio = prio_input;
+        }
+    }
+    if (args->text.desc == NULL) {
+        printf("description: (%s) ",
+                cmditem_find(cmditem, args->text.cmd)->desc);
+        console_input_s(desc_input, 2048);
+        if (strcmp(desc_input, "") != 0) {
+            args->text.desc = desc_input;
+        }
+    }
+    printf("[%s] [%s] [%s]\n", args->text.cmd, args->text.prio, args->text.desc);
+}
+
 /*
 void console_input(char *dst, int size)
 {
@@ -191,10 +222,16 @@ int main(int argc, char *argv[])
         perror(error_str);
         return 1;
     }
+    listfile_read(&listfile);
 
     /* enter add mode if mode is add/edit TODO: fix*/
     if (args->mode == ARGS_EDIT) {
-        add_mode(&listfile, args);
+        if (args->flags & FLAGS_ADD) {
+            add_mode(&listfile, args);
+        } else if (args->flags & FLAGS_MODIFY) {
+            /* TODO: INVALID CODE!!! */
+            modify_mode(&listfile, args, (struct cmditem*)NULL);
+        }
         return 0;
     }
 
