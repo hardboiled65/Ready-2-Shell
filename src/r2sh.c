@@ -60,6 +60,9 @@ void print_item(struct cmditem *item)
     } else {
         return;
     }
+    if (item->cmd == NULL) {
+        return;
+    }
     if (check_command(item->cmd) == 0) {
         if (is_set_verbose(flags)) {
             printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
@@ -329,6 +332,7 @@ int main(int argc, char *argv[])
     }
     /* read file and parse that */
     listfile_read(&listfile);
+    cmditem_init(&cmditem);
     for (i = 0; i < listfile.lines->num; ++i) {
         if ((listfile.lines->data[i] != NULL)
                 && (strlen(listfile.lines->data[i]) != 0)) {
@@ -336,8 +340,8 @@ int main(int argc, char *argv[])
                 cmditem_tmp = &cmditem;
             } else {
                 cmditem_tmp = (struct cmditem*)malloc(sizeof(struct cmditem));
+                cmditem_init(cmditem_tmp);
             }
-            cmditem_init(cmditem_tmp);
             cmditem_parse_string(cmditem_tmp, listfile.lines->data[i]);
             cmditem_tmp->line = i + 1;
             if (i != 0) {

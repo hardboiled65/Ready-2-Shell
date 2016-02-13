@@ -24,10 +24,17 @@ void listfile_init(struct listfile *listfile)
 
 int listfile_open(struct listfile *listfile, const char *filename)
 {
+    char *default_path;
     struct stat st;
-    if (stat(filename, &st) != 0) {
+
+    default_path = (char*)malloc(sizeof(char) * (strlen(getenv("HOME"))
+                                + strlen("/.r2shlist") + 1));
+    sprintf(default_path, "%s/%s", getenv("HOME"), ".r2shlist");
+
+    if ((stat(filename, &st) != 0) && (strcmp(default_path, filename) != 0)) {
         return LISTFILE_ERROR_NOT_FOUND;
     }
+    free(default_path);
 
     listfile->r_file = fopen(filename, "a+");
 
