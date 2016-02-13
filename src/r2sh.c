@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
     }
     /* print version and exit if mode is version */
     if (args->mode == ARGS_VERSION) {
-        printf("version\n");
+        printf("%s\n", INFORMATION_VERSION);
         return 0;
     }
 
