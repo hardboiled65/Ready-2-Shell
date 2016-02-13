@@ -106,6 +106,10 @@ void modify_mode(struct listfile *listfile, struct args *args,
 {
     char prio_input[3];
     char desc_input[2048];
+    struct cmditem *found;
+    int new_str_len;
+    char *new_str;
+    char prio_char;
 
     /* print error message if command not specified */
     if (args->text.cmd == NULL) {
@@ -113,23 +117,70 @@ void modify_mode(struct listfile *listfile, struct args *args,
         return;
     }
     /* show and input new information */
+    if ((found = cmditem_find(cmditem, args->text.cmd)) == NULL) {
+        printf("error: %s: no such command in the list\n", args->text.cmd);
+        return;
+    }
+    printf("command: (%s)\n", found->cmd);
     if (args->text.prio == NULL) {
         printf("priority [0: important / 1: normal / 2: extra]: (%d) ",
-                cmditem_find(cmditem, args->text.cmd)->prio);
+                found->prio);
         console_input_s(prio_input, 2);
         if (strcmp(prio_input, "") != 0) {
-            args->text.prio = prio_input;
+            found->prio = atoi(prio_input);
         }
+    } else {
+        found->prio = atoi(args->text.prio);
     }
     if (args->text.desc == NULL) {
-        printf("description: (%s) ",
-                cmditem_find(cmditem, args->text.cmd)->desc);
+        printf("description: (%s) ", found->desc);
         console_input_s(desc_input, 2048);
         if (strcmp(desc_input, "") != 0) {
-            args->text.desc = desc_input;
+            // args->text.desc = desc_input;
+            if (cmditem->desc != NULL) {
+                free(cmditem->desc);
+                found->desc = NULL;
+            }
+            found->desc = (char*)malloc( (sizeof(char) * strlen(desc_input))
+                                            + 1 );
+            strcpy(found->desc, desc_input);
         }
+    } else {
+        if (found->desc != NULL) {
+            free(found->desc);
+            found->desc = NULL;
+        }
+        found->desc = (char*)malloc( (sizeof(char) * strlen(args->text.desc))
+                                        + 1 );
+        strcpy(found->desc, args->text.desc);
     }
-    printf("[%s] [%s] [%s]\n", args->text.cmd, args->text.prio, args->text.desc);
+    printf("[%s] [%d] [%s]\n", found->cmd, found->prio, found->desc);
+    new_str_len = strlen(found->cmd);
+    new_str_len += 2; /* tab and prio */
+    new_str_len += (found->desc != NULL) ? 1 + strlen(found->desc) : 0;
+                      /* tab and desc if description exists */
+    new_str_len += 1; /* null-char */
+    new_str = (char*)malloc(sizeof(char) * new_str_len);
+    switch (found->prio) {
+    case CMDITEM_IMPORTANT:
+        prio_char = 'i';
+        break;
+    case CMDITEM_NORMAL:
+        prio_char = 'n';
+        break;
+    case CMDITEM_EXTRA:
+        prio_char = 'e';
+        break;
+    default:
+        break;
+    }
+    if (found->desc != NULL) {
+        sprintf(new_str, "%s\t%c\t%s", found->cmd, prio_char, found->desc);
+    } else {
+        sprintf(new_str, "%s\t%c", found->cmd, prio_char);
+    }
+    free(listfile->lines->data[found->line - 1]);
+    listfile->lines->data[found->line - 1] = new_str;
 }
 
 /*
@@ -179,6 +230,9 @@ int main(int argc, char *argv[])
     struct listitem *item;
     struct list *list_it;   /* for print */
     char *error_str;        /* for perror */
+    struct cmditem cmditem;
+    int i;
+    struct cmditem *cmditem_tmp;
 
     args = parse_args(argc, argv);
 
@@ -222,15 +276,32 @@ int main(int argc, char *argv[])
         perror(error_str);
         return 1;
     }
+    /* read file and parse that */
     listfile_read(&listfile);
+    for (i = 0; i < listfile.lines->num; ++i) {
+        if ((listfile.lines->data[i] != NULL)
+                && (strlen(listfile.lines->data[i]) != 0)) {
+            if (i == 0) { /* for root */
+                cmditem_tmp = &cmditem;
+            } else {
+                cmditem_tmp = (struct cmditem*)malloc(sizeof(struct cmditem));
+            }
+            cmditem_init(cmditem_tmp);
+            cmditem_parse_string(cmditem_tmp, listfile.lines->data[i]);
+            cmditem_tmp->line = i + 1;
+            if (i != 0) {
+                cmditem_append(&cmditem, cmditem_tmp);
+            }
+        }
+    }
 
     /* enter add mode if mode is add/edit TODO: fix*/
     if (args->mode == ARGS_EDIT) {
         if (args->flags & FLAGS_ADD) {
             add_mode(&listfile, args);
         } else if (args->flags & FLAGS_MODIFY) {
-            /* TODO: INVALID CODE!!! */
-            modify_mode(&listfile, args, (struct cmditem*)NULL);
+            modify_mode(&listfile, args, &cmditem);
+            listfile_write(&listfile, listfile_path);
         }
         return 0;
     }
