@@ -48,18 +48,21 @@ int listfile_read(struct listfile *listfile)
     }
 
     while ((buf = fgetc(listfile->r_file)) != EOF) {
-        printf("[%c]", buf);
         ++file_offset;
         /* count characters of the line */
-        while (buf != '\n') {
+        while (buf != '\n' && buf != EOF) {
             buf = fgetc(listfile->r_file);
-            printf("[%c]", buf);
             ++file_offset;
         }
         /* rewind to begin of the line */
-        fseek(listfile->r_file, -file_offset, SEEK_CUR);
+        /* if read is EOF, file seek not forwarded. so rewind 1 step less */
+        if (buf != EOF) {
+            fseek(listfile->r_file, -file_offset, SEEK_CUR);
+        } else {
+            fseek(listfile->r_file, -(file_offset - 1), SEEK_CUR);
+        }
         /* read to memory */
-        temp = (char*)malloc((sizeof(char) * file_offset) + 1);
+        temp = (char*)malloc(sizeof(char) * file_offset);
         fgets(temp, file_offset, listfile->r_file);
         lines_append(listfile->lines, temp);
 
