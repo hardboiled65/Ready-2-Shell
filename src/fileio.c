@@ -174,7 +174,6 @@ int listfile_writeln(struct listfile *listfile, struct listitem *item)
     char *prio_char;
 
     /* write an item to file */
-    printf("item->cmd: %s\n", item->cmd);
     fputs(item->cmd, listfile->r_file);
     fputs("\t", listfile->r_file);
 
@@ -191,11 +190,9 @@ int listfile_writeln(struct listfile *listfile, struct listitem *item)
     default:
         break;
     }
-    printf("prio_char: %s\n", prio_char);
     fputs(prio_char, listfile->r_file);
     fputs("\t", listfile->r_file);
 
-    printf("item->desc: %s\n", item->desc);
     fputs(item->desc, listfile->r_file);
     fputs("\n", listfile->r_file);
 
