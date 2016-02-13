@@ -18,6 +18,7 @@ void listfile_init(struct listfile *listfile)
 {
     listfile->r_file = NULL;
     listfile->w_file = NULL;
+    listfile->lines = (struct lines*)malloc(sizeof(struct lines));
     lines_init(listfile->lines);
 }
 
