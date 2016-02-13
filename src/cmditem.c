@@ -96,6 +96,10 @@ struct cmditem* cmditem_find(struct cmditem *cmditem, const char *key)
     struct cmditem *find = NULL;
 
     it = cmditem;
+    /* return immediately if root is not set (means empty tree) */
+    if (it->cmd == NULL) {
+        return find;
+    }
     while (it != NULL) {
         if (strcmp(key, it->cmd) < 0) {
             it = it->left;
