@@ -44,13 +44,17 @@ enum cmditem_priority {
 
 enum cmditem_error {
     CMDITEM_ERROR_NO_ERROR = 0,
-    CMDITEM_ERROR_NOT_ROOT = 1,
+    CMDITEM_ERROR_PARSE_ERROR = 1,
+    CMDITEM_ERROR_NOT_ROOT = 2,
 };
 
 void cmditem_init(struct cmditem *cmditem);
+int cmditem_parse_string(struct cmditem *cmditem, const char *str);
 int cmditem_append(struct cmditem *cmditem, struct cmditem *new_item);
 struct cmditem* cmditem_find(struct cmditem *cmditem, const char *key);
+void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*));
 int cmditem_remove(struct cmditem *cmditem, struct cmditem *item);
 void cmditem_free(struct cmditem *cmditem);
+int cmditem_to_prio(const char ch);
 
 #endif /* _CMDITEM_H */
