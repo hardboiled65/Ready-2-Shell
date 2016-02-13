@@ -96,7 +96,7 @@ struct cmditem* cmditem_find(struct cmditem *cmditem, const char *key)
     struct cmditem *find = NULL;
 
     it = cmditem;
-    while (it->left != NULL || it->right != NULL) {
+    while (it != NULL) {
         if (strcmp(key, it->cmd) < 0) {
             it = it->left;
         } else if (strcmp(key, it->cmd) > 0) {
