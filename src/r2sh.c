@@ -18,6 +18,8 @@
 #include "fileio.h"
 #include "information.h"
 
+static int flags;
+
 int check_command(const char *cmd)
 {
     char *system_command;
@@ -32,6 +34,25 @@ int check_command(const char *cmd)
 }
 
 void print(struct listitem *item, int flags)
+{
+    if (item->prio == LISTITEM_IMPORTANT && is_set_important(flags)) {
+    } else if (item->prio == LISTITEM_NORMAL && is_set_normal(flags)) {
+    } else if (item->prio == LISTITEM_EXTRA && is_set_extra(flags)) {
+    } else {
+        return;
+    }
+    if (check_command(item->cmd) == 0) {
+        if (is_set_verbose(flags)) {
+            printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
+            printf("\t--> [OK]\n");
+        }
+    } else {
+        printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
+        printf("\t--> [NOT INSTALLED]\n");
+    }
+}
+
+void print_item(struct cmditem *item)
 {
     if (item->prio == LISTITEM_IMPORTANT && is_set_important(flags)) {
     } else if (item->prio == LISTITEM_NORMAL && is_set_normal(flags)) {
@@ -341,6 +362,9 @@ int main(int argc, char *argv[])
 
     /* if mode is print, scan r2shlist file and print results. */
 
+    flags = args->flags;
+    cmditem_traversal(&cmditem, print_item);
+#if 0
     /* create list */
     list = (struct list*)malloc(sizeof(struct list));
     list_init(list);
@@ -360,6 +384,7 @@ int main(int argc, char *argv[])
         print(list_it->item, args->flags);
         list_it = list_it->next;
     }
+#endif
 
     listfile_close(&listfile);
     listfile_free(&listfile);
