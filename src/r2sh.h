@@ -15,14 +15,17 @@
 #define COMMAND_FORMAT_LEN  24
 
 struct args;
+struct cmditem;
 struct listfile;
 struct listitem;
 
 int check_command(const char *cmd);
 void print(struct listitem *item, int flags);
 void add_mode(struct listfile *listfile, struct args *args);
-void modify_mode();
-void delete_mode();
+void modify_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem);
+void delete_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem);
 
 /**
  * console_input_s(char* dst, int size)

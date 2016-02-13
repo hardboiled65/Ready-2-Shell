@@ -183,6 +183,36 @@ void modify_mode(struct listfile *listfile, struct args *args,
     listfile->lines->data[found->line - 1] = new_str;
 }
 
+void delete_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem)
+{
+    char cmd_input[1024];
+    struct cmditem *found;
+
+    if (args->text.cmd == NULL) {
+        printf("command: ");
+        console_input_s(cmd_input, 1024);
+        /* if input nothing, show input prompt again */
+        while (strlen(cmd_input) == 0) {
+            printf("command: ");
+            console_input_s(cmd_input, 1024);
+        }
+    }
+    if (args->text.cmd == NULL) {
+        found = cmditem_find(cmditem, cmd_input);
+    } else {
+        found = cmditem_find(cmditem, args->text.cmd);
+    }
+    if (found == NULL) {
+        printf("error: no such command\n");
+        return;
+    }
+    free(listfile->lines->data[found->line - 1]);
+    listfile->lines->data[found->line - 1] = NULL;
+    printf("deleted: [%s] [%d] [%s]\n", found->cmd, found->prio, found->desc);
+    /* TODO: also delete from cmditem */
+}
+
 /*
 void console_input(char *dst, int size)
 {
@@ -295,12 +325,15 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* enter add mode if mode is add/edit TODO: fix*/
+    /* enter modifying mode if mode is add/edit */
     if (args->mode == ARGS_EDIT) {
         if (args->flags & FLAGS_ADD) {
             add_mode(&listfile, args);
         } else if (args->flags & FLAGS_MODIFY) {
             modify_mode(&listfile, args, &cmditem);
+            listfile_write(&listfile, listfile_path);
+        } else if (args->flags & FLAGS_DELETE) {
+            delete_mode(&listfile, args, &cmditem);
             listfile_write(&listfile, listfile_path);
         }
         return 0;
