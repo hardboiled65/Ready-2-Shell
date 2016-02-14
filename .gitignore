@@ -1,4 +1,5 @@
 r2sh
 test/
 *.o
+*.swp
 .sconsign.dblite
