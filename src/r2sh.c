@@ -55,9 +55,18 @@ void print(struct listitem *item, int flags)
 
 void print_item(struct cmditem *item)
 {
+    char *circle_color;
+    char *prio_str;
+
     if (item->prio == LISTITEM_IMPORTANT && is_set_important(flags)) {
+        circle_color = COLOR_RED;
+        prio_str = STRING_IMPORTANT;
     } else if (item->prio == LISTITEM_NORMAL && is_set_normal(flags)) {
+        circle_color = COLOR_YELLOW;
+        prio_str = STRING_NORMAL;
     } else if (item->prio == LISTITEM_EXTRA && is_set_extra(flags)) {
+        circle_color = COLOR_BLUE;
+        prio_str = STRING_EXTRA;
     } else {
         return;
     }
@@ -66,12 +75,20 @@ void print_item(struct cmditem *item)
     }
     if (check_command(item->cmd) == 0) {
         if (is_set_verbose(flags)) {
-            printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
-            printf("\t--> [OK]\n");
+            printf("%-12s  %s●%s %s%-9s%s --> %s[OK]           %s  %s\n",
+                item->cmd,
+                circle_color, COLOR_RESET,
+                COLOR_BOLD, prio_str, COLOR_RESET,
+                COLOR_GREEN, COLOR_RESET,
+                (item->desc != NULL) ? item->desc : "");
         }
     } else {
-        printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
-        printf("\t--> [NOT INSTALLED]\n");
+        printf("%-12s  %s●%s %s%-9s%s --> %s[NOT INSTALLED]%s  %s\n",
+            item->cmd,
+            circle_color, COLOR_RESET,
+            COLOR_BOLD, prio_str, COLOR_RESET,
+            COLOR_RED, COLOR_RESET,
+            (item->desc != NULL) ? item->desc : "");
     }
 }
 

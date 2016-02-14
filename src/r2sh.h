@@ -14,6 +14,17 @@
 /*                     24 -> |__________  ____________| */
 #define COMMAND_FORMAT_LEN  24
 
+#define STRING_IMPORTANT    "IMPORTANT"
+#define STRING_NORMAL       "NORMAL"
+#define STRING_EXTRA        "EXTRA"
+
+#define COLOR_RESET         "\e[00m"
+#define COLOR_RED           "\e[31m"
+#define COLOR_GREEN         "\e[32m"
+#define COLOR_YELLOW        "\e[1;33m"
+#define COLOR_BLUE          "\e[34m"
+#define COLOR_BOLD          "\e[1m"
+
 struct args;
 struct cmditem;
 struct listfile;
