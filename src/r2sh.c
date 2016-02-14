@@ -279,10 +279,8 @@ int main(int argc, char *argv[])
     struct args *args;
     struct listfile listfile;
     char *listfile_path;
-    struct list *list;
     int read_result;
     struct listitem *item;
-    struct list *list_it;   /* for print */
     char *error_str;        /* for perror */
     struct cmditem cmditem;
     int i;
