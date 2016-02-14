@@ -368,27 +368,6 @@ int main(int argc, char *argv[])
 
     flags = args->flags;
     cmditem_traversal(&cmditem, print_item);
-#if 0
-    /* create list */
-    list = (struct list*)malloc(sizeof(struct list));
-    list_init(list);
-
-    item = (struct listitem*)malloc(sizeof(struct listitem));
-    listitem_init(item);
-    read_result = listfile_readline(&listfile, item);
-    while (read_result != LISTFILE_ERROR_FILE_EOF) {
-        list_append(list, item);
-        item = (struct listitem*)malloc(sizeof(struct listitem));
-        listitem_init(item);
-        read_result = listfile_readline(&listfile, item);
-    }
-
-    list_it = list->next;
-    while (list_it != NULL) {
-        print(list_it->item, args->flags);
-        list_it = list_it->next;
-    }
-#endif
 
     listfile_close(&listfile);
     listfile_free(&listfile);
