@@ -85,7 +85,7 @@ int listfile_readline(struct listfile *listfile, struct listitem *item)
     char buf;
     int file_offset = 0;
 
-    if (listfile->file == NULL) {
+    if (listfile->r_file == NULL) {
         return LISTFILE_ERROR_NOT_OPENED;
     }
     
