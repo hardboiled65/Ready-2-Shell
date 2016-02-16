@@ -126,14 +126,14 @@ struct args_text;
  * struct args_text - text arguments
  *
  * - members
- * in       input file
+ * file     input file
  * out      output file
  * cmd      command name
  * prio     priority
  * desc     description
  */
 struct args_text {
-    const char *in;
+    const char *file;
     const char *out;
     const char *cmd;
     const char *prio;

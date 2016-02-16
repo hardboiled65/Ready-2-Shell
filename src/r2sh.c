@@ -313,18 +313,18 @@ int main(int argc, char *argv[])
         sprintf(listfile_path, "%s/%s", getenv("HOME"), ".r2shlist");
     } else {
         /* input flag set but filename missing */
-        if (args->text.in == NULL) {
+        if (args->text.file == NULL) {
             printf("%s: missing filename\n", argv[0]);
             return 1;
         }
-        listfile_path = (char*)malloc(sizeof(char) * (strlen(args->text.in)
+        listfile_path = (char*)malloc(sizeof(char) * (strlen(args->text.file)
                                     + 1));
-        sprintf(listfile_path, "%s", args->text.in);
+        sprintf(listfile_path, "%s", args->text.file);
     }
     if (listfile_open(&listfile, listfile_path) != LISTFILE_ERROR_NO_ERROR) {
         error_str = (char*)malloc(sizeof(char) * (strlen(argv[0]) + strlen(": ")
-                                    + strlen(args->text.in) + 1));
-        sprintf(error_str, "%s: %s", argv[0], args->text.in);
+                                    + strlen(args->text.file) + 1));
+        sprintf(error_str, "%s: %s", argv[0], args->text.file);
         perror(error_str);
         return 1;
     }

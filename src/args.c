@@ -14,7 +14,7 @@
 
 void args_text_init(struct args_text *args_text)
 {
-    args_text->in = NULL;
+    args_text->file = NULL;
     args_text->out = NULL;
     args_text->cmd = NULL;
     args_text->prio = NULL;
@@ -67,7 +67,7 @@ struct args* parse_args(int argc, char *argv[])
                 break;
             case ARGS_FILE_PATH_SHORT:
                 args->flags |= FLAGS_INPUT;
-                if ((i + 1) < argc) args->text.in = argv[i + 1];
+                if ((i + 1) < argc) args->text.file = argv[i + 1];
                 break;
             case ARGS_OUTPUT_SHORT:
                 args->flags |= FLAGS_OUTPUT;
@@ -122,7 +122,7 @@ struct args* parse_args(int argc, char *argv[])
                     args->flags |= FLAGS_VERSION;
                 } else if (args_compare_long(argv[i], ARGS_FILE_PATH_LONG)) {
                     args->flags |= FLAGS_INPUT;
-                    args->text.in = strip_long_arg(argv[i], ARGS_FILE_PATH_LONG);
+                    args->text.file = strip_long_arg(argv[i], ARGS_FILE_PATH_LONG);
                 } else if (args_compare_long(argv[i], ARGS_OUTPUT_LONG)) {
                     args->flags |= FLAGS_OUTPUT;
                     args->text.out = strip_long_arg(argv[i], ARGS_OUTPUT_LONG);
