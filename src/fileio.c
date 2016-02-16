@@ -226,6 +226,10 @@ void listfile_free(struct listfile *listfile)
         free(listfile->w_file);
         listfile->w_file = NULL;
     }
+    if (listfile->lines != NULL) {
+        lines_free(listfile->lines);
+        listfile->lines = NULL;
+    }
 }
 
 /* struct lines */
@@ -259,8 +263,17 @@ void lines_append(struct lines *lines, char *line_str)
 
 void lines_free(struct lines *lines)
 {
-    /* TODO: free whole line data */
-    lines->data = NULL;
+    int i;
+
+    for (i = 0; i < lines->num; ++i) {
+        if (lines->data[i] != NULL) {
+            free(lines->data[i]);
+        }
+    }
+    if (lines->data != NULL) {
+        free(lines->data);
+        lines->data = NULL;
+    }
 }
 
 /* struct list */

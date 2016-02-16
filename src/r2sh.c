@@ -367,6 +367,7 @@ int main(int argc, char *argv[])
     flags = args->flags;
     cmditem_traversal(&cmditem, print_item);
 
+    cmditem_free(&cmditem);
     listfile_close(&listfile);
     listfile_free(&listfile);
 

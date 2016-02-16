@@ -126,6 +126,24 @@ void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*))
 
 void cmditem_free(struct cmditem *cmditem)
 {
+    if (cmditem->left != NULL) {
+        cmditem_free(cmditem->left);
+    }
+    if (cmditem->right != NULL) {
+        cmditem_free(cmditem->right);
+    }
+    if (cmditem != NULL) {
+        if (cmditem->cmd != NULL) {
+            free(cmditem->cmd);
+        }
+        if (cmditem->desc != NULL) {
+            free(cmditem->desc);
+        }
+        /* root item should be freed manually */
+        if (cmditem->parent != NULL) {
+            free(cmditem);
+        }
+    }
 }
 
 int cmditem_to_prio(const char ch)
