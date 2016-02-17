@@ -34,25 +34,6 @@ int check_command(const char *cmd)
     return res;
 }
 
-void print(struct listitem *item, int flags)
-{
-    if (item->prio == LISTITEM_IMPORTANT && is_set_important(flags)) {
-    } else if (item->prio == LISTITEM_NORMAL && is_set_normal(flags)) {
-    } else if (item->prio == LISTITEM_EXTRA && is_set_extra(flags)) {
-    } else {
-        return;
-    }
-    if (check_command(item->cmd) == 0) {
-        if (is_set_verbose(flags)) {
-            printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
-            printf("\t--> [OK]\n");
-        }
-    } else {
-        printf("[%s]\t[%d]\t[%s]", item->cmd, item->prio, item->desc);
-        printf("\t--> [NOT INSTALLED]\n");
-    }
-}
-
 void print_item(struct cmditem *item)
 {
     char *circle_color;

@@ -31,7 +31,6 @@ struct listfile;
 struct listitem;
 
 int check_command(const char *cmd);
-void print(struct listitem *item, int flags);
 void print_item(struct cmditem *item);
 void add_mode(struct listfile *listfile, struct args *args);
 void modify_mode(struct listfile *listfile, struct args *args,
