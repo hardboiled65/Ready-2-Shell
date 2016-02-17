@@ -85,10 +85,13 @@ void add_mode(struct listfile *listfile, struct args *args)
     if (args->text.cmd == NULL) {
         printf("command: ");
         console_input_s(cmd_input, 1024);
-        /* TODO: if input nothing, show input prompt again */
         while (strlen(cmd_input) == 0) {
             printf("command: ");
             console_input_s(cmd_input, 1024);
+        }
+        if (check_command(cmd_input) != 0) {
+            printf("%s%s%s is not installed. if this is a misspelling, Ctrl + C to cancel.\n",
+                COLOR_BOLD, cmd_input, COLOR_RESET);
         }
         args->text.cmd = cmd_input;
     }
