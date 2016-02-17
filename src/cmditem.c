@@ -33,6 +33,9 @@ int cmditem_parse_string(struct cmditem *cmditem, const char *str)
     for (i = 0; (str[i] != ' ') && (str[i] != '\t'); ++i) {
         count += 1;
     }
+    if (count == 0) {
+        return CMDITEM_ERROR_PARSE_ERROR;
+    }
     cmditem->cmd = (char*)malloc((sizeof(char) * count) + 1);
     strncpy(cmditem->cmd, str, count + 1);
     cmditem->cmd[count] = '\0';

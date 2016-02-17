@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
     struct args *args;
     struct listfile listfile;
     char *listfile_path;
-    int read_result;
+    int err;
     struct listitem *item;
     char *error_str;        /* for perror */
     struct cmditem cmditem;
@@ -340,7 +340,12 @@ int main(int argc, char *argv[])
                 cmditem_tmp = (struct cmditem*)malloc(sizeof(struct cmditem));
                 cmditem_init(cmditem_tmp);
             }
-            cmditem_parse_string(cmditem_tmp, listfile.lines->data[i]);
+            err = cmditem_parse_string(cmditem_tmp, listfile.lines->data[i]);
+            if (err == CMDITEM_ERROR_PARSE_ERROR) {
+                printf("parsing error: line %d\n", i + 1);
+                printf("%s\n", listfile.lines->data[i]);
+                return 1;
+            }
             cmditem_tmp->line = i + 1;
             if (i != 0) {
                 cmditem_append(&cmditem, cmditem_tmp);
