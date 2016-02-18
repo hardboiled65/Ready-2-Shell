@@ -17,6 +17,7 @@
 #include "cmditem.h"
 #include "fileio.h"
 #include "information.h"
+#include "whatis.h"
 
 static int flags;
 
@@ -79,6 +80,7 @@ void add_mode(struct listfile *listfile, struct args *args)
     char cmd_input[1024];
     char prio_input[3];
     char desc_input[2048];
+    char *desc_auto;
     struct listitem item;
 
     /* check which argument is not passed and ask to input */
@@ -102,13 +104,25 @@ void add_mode(struct listfile *listfile, struct args *args)
         args->text.prio = prio_input;
     }
     if (args->text.desc == NULL) {
-        printf("description: () ");
-        console_input_s(desc_input, 2048);
-        /* default is "" */
-        if (strlen(desc_input) == 0) {
-            strcpy(desc_input, "");
+        /* get short description with whatis */
+        desc_auto = whatis_get(args->text.cmd);
+        if (desc_auto != NULL) {
+            printf("description: (%s) ", desc_auto);
+        } else {
+            printf("description: () ");
         }
-        args->text.desc = desc_input;
+        console_input_s(desc_input, 2048);
+        if (strlen(desc_input) == 0) {
+            /* use short description that automatically obtained or "" if not */
+            if (desc_auto != NULL) {
+                args->text.desc = desc_auto;
+            } else {
+                strcpy(desc_input, "");
+                args->text.desc = desc_input;
+            }
+        } else {
+            args->text.desc = desc_input;
+        }
     }
     printf("[%s] [%s] [%s]\n", args->text.cmd, args->text.prio, args->text.desc);
 
