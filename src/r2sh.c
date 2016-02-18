@@ -96,7 +96,7 @@ void add_mode(struct listfile *listfile, struct args *args)
         printf("priority [0: important / 1: normal / 2: extra]: (1) ");
         console_input_s(prio_input, 2);
         /* default is normal(1) */
-        if (prio_input[0] == '\n') {
+        if (strlen(prio_input) == 0) {
             strcpy(prio_input, "1");
         }
         args->text.prio = prio_input;
@@ -105,7 +105,7 @@ void add_mode(struct listfile *listfile, struct args *args)
         printf("description: () ");
         console_input_s(desc_input, 2048);
         /* default is "" */
-        if (desc_input[0] == '\n') {
+        if (strlen(desc_input) == 0) {
             strcpy(desc_input, "");
         }
         args->text.desc = desc_input;
