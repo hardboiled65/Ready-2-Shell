@@ -32,6 +32,7 @@ $ sudo cp r2sh /usr/local/bin
 Usage
 -----
 ![demo](https://https://raw.githubusercontent.com/hardboiled65/Ready-2-Shell/master/doc/r2shdemo.gif)
+
 Ready 2 Shell will create a file named **.r2shlist** in your home directory first time.
 ### Print
 ```sh
@@ -43,6 +44,7 @@ For specific priorities, combine below options.
 * **-i** important
 * **-n** normal
 * **-x** extra
+
 Or for all, use this.
 * **-a** all
 
