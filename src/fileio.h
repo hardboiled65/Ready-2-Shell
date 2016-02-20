@@ -14,7 +14,6 @@
 
 struct listfile;
 struct lines;
-struct list;
 struct listitem;
 
 /**
@@ -63,21 +62,6 @@ struct lines {
 void lines_init(struct lines *lines);
 void lines_append(struct lines *lines, char *line_str);
 void lines_free(struct lines *lines);
-
-/**
- * struct list - double linked list for items
- *
- * descr//
- */
-struct list {
-    struct list *prev;
-    struct list *next;
-    struct listitem *item;
-};
-
-void list_init(struct list *list);
-struct list* list_append(struct list *list, struct listitem *new_item);
-void list_free(struct list *list);
 
 /**
  * struct listitem - an item about the command

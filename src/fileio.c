@@ -276,41 +276,6 @@ void lines_free(struct lines *lines)
     }
 }
 
-/* struct list */
-void list_init(struct list *list)
-{
-    list->prev = NULL;
-    list->next = NULL;
-    list->item = (struct listitem*)malloc(sizeof(struct listitem*));
-    listitem_init(list->item);
-}
-
-struct list* list_append(struct list *list, struct listitem *new_item)
-{
-    struct list *it;
-    struct list *new_list;
-
-    it = list;
-    while (it->next != NULL) {
-        it = it->next;
-    }
-    it->next = (struct list*)malloc(sizeof(struct list));
-    new_list = it->next;
-
-    /* init new list */
-    new_list->prev = it;
-    new_list->next = NULL;
-    new_list->item = new_item;
-
-    return new_list;
-}
-
-void list_free(struct list *list)
-{
-    /* destroy links */
-    listitem_free(list->item);
-}
-
 /* struct listitem */
 void listitem_init(struct listitem *listitem)
 {
