@@ -15,9 +15,9 @@
 #define WHATIS_FORMAT           "whatis %s >> /dev/null"
 /*                         20 -> |______  ____________| */
 #define WHATIS_FORMAT_LEN       20
-#define WHATIS_SED_FORMAT       "whatis %s |head -1 |sed -r 's/.* - //'"
-/*                         35 -> |______  ____________________________| */
-#define WHATIS_SED_FORMAT_LEN   35
+#define WHATIS_SED_FORMAT       "whatis %s |head -1 |sed -r -e 's/.* - //'"
+/*                         38 -> |______  _______________________________| */
+#define WHATIS_SED_FORMAT_LEN   38
 
 /**
  * int whatis_is_installed() - check whatis command installed or not installed
