@@ -54,7 +54,17 @@ int cmditem_append(struct cmditem *cmditem, struct cmditem *new_item);
 struct cmditem* cmditem_find(struct cmditem *cmditem, const char *key);
 void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*));
 int cmditem_remove(struct cmditem *cmditem, struct cmditem *item);
+struct cmditem* cmditem_begin(struct cmditem *cmditem);
+struct cmditem* cmditem_next(struct cmditem *cmditem, struct cmditem *item);
 void cmditem_free(struct cmditem *cmditem);
+
+/* private functions */
+static struct cmditem* least_child(struct cmditem *item);
+static struct cmditem* greatest_child(struct cmditem *item);
+static struct cmditem* nearest_greater_ancestor(struct cmditem *item);
+static struct cmditem* grandparent(struct cmditem *item);
+
+/* non-member functions */
 int cmditem_to_prio(const char ch);
 
 #endif /* _CMDITEM_H */

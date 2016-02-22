@@ -127,6 +127,27 @@ void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*))
     }
 }
 
+struct cmditem* cmditem_begin(struct cmditem *cmditem)
+{
+    return least_child(cmditem);
+}
+
+struct cmditem* cmditem_next(struct cmditem *cmditem, struct cmditem *item)
+{
+    struct cmditem *next;
+
+    if (item->right != NULL) {
+        /* go to least child of right, or to right if not */
+        if ((next = least_child(item->right)) == NULL) {
+            next = item->right;
+        }
+    } else {
+        next = nearest_greater_ancestor(item);
+    }
+
+    return next;
+}
+
 void cmditem_free(struct cmditem *cmditem)
 {
     if (cmditem->left != NULL) {
@@ -149,6 +170,68 @@ void cmditem_free(struct cmditem *cmditem)
     }
 }
 
+/* private functions */
+struct cmditem* least_child(struct cmditem *item)
+{
+    struct cmditem *it;
+
+    it = item->left;
+    /* return null if the item is the least */
+    if (it == NULL) {
+        return it;
+    }
+
+    while (it->left != NULL) {
+        it = it->left;
+    }
+    return it;
+}
+
+struct cmditem* greatest_child(struct cmditem *item)
+{
+    struct cmditem *it;
+
+    it = item->right;
+    /* return null if the item is the greatest */
+    if (it == NULL) {
+        return it;
+    }
+
+    while (it->right != NULL) {
+        it = it->right;
+    }
+    return it;
+}
+
+struct cmditem* nearest_greater_ancestor(struct cmditem *item)
+{
+    struct cmditem *it;
+
+    it = item;
+    while ((it->parent != NULL) && (it != it->parent->left)) {
+        it = it->parent;
+    }
+
+    /* parent is greater than child if child is left of parent */
+    if ((it->parent != NULL) && (it == it->parent->left)) {
+        return it->parent;
+    }
+    /* if 'it' is root, there's no greater parent than the item */
+    if (it->parent == NULL) {
+        return NULL;
+    }
+}
+
+struct cmditem* grandparent(struct cmditem *item)
+{
+    if (item->parent != NULL) {
+        return item->parent->parent;
+    } else {
+        return NULL;
+    }
+}
+
+/* non-member functions */
 int cmditem_to_prio(const char ch)
 {
     int prio;
