@@ -40,6 +40,8 @@ void args_set_mode(struct args *args)
         args->mode = ARGS_VERSION;
     } else if (is_edit_mode(args->flags)) {
         args->mode = ARGS_EDIT;
+    } else if (is_output_mode(args->flags)) {
+        args->mode = ARGS_OUTPUT;
     }
 }
 

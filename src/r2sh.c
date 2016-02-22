@@ -252,6 +252,32 @@ void delete_mode(struct listfile *listfile, struct args *args,
     /* TODO: also delete from cmditem */
 }
 
+void output_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem)
+{
+    struct cmditem *it;
+    FILE *output;
+
+    if (args->text.out != NULL) {
+        output = fopen(args->text.out, "w");
+    } else {
+        output = stdout;
+    }
+
+    it = cmditem_begin(cmditem);
+    while (it != NULL) {
+        if ((it->prio == CMDITEM_IMPORTANT && is_set_important(args->flags)) ||
+            (it->prio == CMDITEM_NORMAL && is_set_normal(args->flags)) ||
+            (it->prio == CMDITEM_EXTRA && is_set_extra(args->flags))) {
+            if (check_command(it->cmd) != 0) {
+                fprintf(output, "%s ", it->cmd);
+            }
+        }
+        it = cmditem_next(cmditem, it); /* TODO: change to cmditem_next(it) later */
+    }
+    fprintf(output, "\n");
+}
+
 /*
 void console_input(char *dst, int size)
 {
@@ -379,6 +405,12 @@ int main(int argc, char *argv[])
             delete_mode(&listfile, args, &cmditem);
             listfile_write(&listfile, listfile_path);
         }
+        return 0;
+    }
+
+    /* enter output mode if mode is output */
+    if (args->mode == ARGS_OUTPUT) {
+        output_mode(&listfile, args, &cmditem);
         return 0;
     }
 

@@ -88,7 +88,7 @@
 #define is_print_mode(flags) \
     (!((flags) & FLAGS_HELP) && !((flags) & FLAGS_VERSION) \
     && !((flags) & FLAGS_ADD) && !((flags) & FLAGS_MODIFY) \
-    && !((flags) & FLAGS_DELETE))
+    && !((flags) & FLAGS_DELETE) && !((flags) & FLAGS_OUTPUT))
 
 #define is_help_mode(flags) \
     ((flags) & FLAGS_HELP)
@@ -100,6 +100,9 @@
     (((flags) & FLAGS_ADD) \
     || ((flags) & FLAGS_MODIFY) \
     || ((flags) & FLAGS_DELETE))
+
+#define is_output_mode(flags) \
+    (((flags) & FLAGS_OUTPUT))
 
 #define is_set_important(flags) \
     ((flags) & FLAGS_IMPORTANT)
@@ -166,6 +169,7 @@ enum args_mode {
     ARGS_HELP = 1,
     ARGS_VERSION = 2,
     ARGS_EDIT = 3,
+    ARGS_OUTPUT = 4,
 };
 
 void args_init(struct args *args);

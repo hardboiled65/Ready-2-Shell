@@ -36,9 +36,10 @@ static const char* INFORMATION_HELP =
     "  -f, --file=FILE               use alternative input file\n"
     "  -h, --help                    print this help message and exit\n"
     "  -M                            modify a command\n"
-    "  -o, --output=OUTPUT           write to file rather than standard output\n"
-    "                                output format is only command names that\n"
-    "                                separated by space\n"
+    "  -o, --output=OUTPUT           write to file only command names that separated\n"
+    "                                by space\n"
+    "                                without OUTPUT file, it will print to standard\n"
+    "                                output\n"
     "  -p                            with -A or -M, priority of command\n"
     "                                0: important, 1: normal, 2: extra\n"
     "  -V, --version                 print r2sh version and exit\n";

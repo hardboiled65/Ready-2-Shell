@@ -37,6 +37,8 @@ void modify_mode(struct listfile *listfile, struct args *args,
     struct cmditem *cmditem);
 void delete_mode(struct listfile *listfile, struct args *args,
     struct cmditem *cmditem);
+void output_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem);
 
 /**
  * console_input_s(char* dst, int size)
