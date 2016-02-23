@@ -80,6 +80,26 @@ deleted: [emacs] [1] [lisp interpreter]
 $ 
 ```
 
+### Output
+You can use the result as the arguments of other shell commands.
+**-o** option will make formatted output that command names separated by space.
+```sh
+$ r2sh -o output.txt
+$ cat output.txt
+gcc gdb scons
+$ 
+```
+Without output filename, it prints to standard output instead of a file.
+
+If your system is Debian based, the output can be used the arguments of apt-get that like,
+```sh
+$ cat output.txt | xargs sudo apt-get install
+```
+or
+```sh
+$ r2sh -o | xargs sudo apt-get install
+```
+
 License
 -------
 Ready 2 Shell is developed in MIT License. For the detail, see the LICENSE file.
