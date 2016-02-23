@@ -132,17 +132,17 @@ struct cmditem* cmditem_begin(struct cmditem *cmditem)
     return least_child(cmditem);
 }
 
-struct cmditem* cmditem_next(struct cmditem *cmditem, struct cmditem *item)
+struct cmditem* cmditem_next(struct cmditem *cmditem)
 {
     struct cmditem *next;
 
-    if (item->right != NULL) {
+    if (cmditem->right != NULL) {
         /* go to least child of right, or to right if not */
-        if ((next = least_child(item->right)) == NULL) {
-            next = item->right;
+        if ((next = least_child(cmditem->right)) == NULL) {
+            next = cmditem->right;
         }
     } else {
-        next = nearest_greater_ancestor(item);
+        next = nearest_greater_ancestor(cmditem);
     }
 
     return next;

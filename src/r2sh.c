@@ -273,7 +273,7 @@ void output_mode(struct listfile *listfile, struct args *args,
                 fprintf(output, "%s ", it->cmd);
             }
         }
-        it = cmditem_next(cmditem, it); /* TODO: change to cmditem_next(it) later */
+        it = cmditem_next(it);
     }
     fprintf(output, "\n");
 }
