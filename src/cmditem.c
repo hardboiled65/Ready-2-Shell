@@ -129,7 +129,11 @@ void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*))
 
 struct cmditem* cmditem_begin(struct cmditem *cmditem)
 {
-    return least_child(cmditem);
+    if (cmditem->left != NULL) {
+        return least_child(cmditem);
+    } else {
+        return cmditem;
+    }
 }
 
 struct cmditem* cmditem_next(struct cmditem *cmditem)
