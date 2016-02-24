@@ -12,7 +12,7 @@ Features
 * Make a list that shell commands you use
 * Scan the list, then shows you which commands are not installed in the system
 * Filtered as a priority
-* ~~The output file can using after for install packages in batch~~ (Not supported yet)
+* The output file can using after for install packages in batch
 * ~~Analyze shell history file for which commands are mostly used~~ (Not supported yet)
 
 Installation
