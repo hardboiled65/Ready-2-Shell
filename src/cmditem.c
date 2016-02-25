@@ -121,7 +121,9 @@ void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*))
     if (cmditem->left != NULL) {
         cmditem_traversal(cmditem->left, func);
     }
-    func(cmditem);
+    if (cmditem->cmd != NULL) {
+        func(cmditem);
+    }
     if (cmditem->right != NULL) {
         cmditem_traversal(cmditem->right, func);
     }
@@ -129,6 +131,10 @@ void cmditem_traversal(struct cmditem *cmditem, void (*func)(struct cmditem*))
 
 struct cmditem* cmditem_begin(struct cmditem *cmditem)
 {
+    if (cmditem->cmd == NULL) {
+        return NULL;
+    }
+
     if (cmditem->left != NULL) {
         return least_child(cmditem);
     } else {
