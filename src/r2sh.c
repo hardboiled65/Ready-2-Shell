@@ -265,10 +265,6 @@ void output_mode(struct listfile *listfile, struct args *args,
     }
 
     it = cmditem_begin(cmditem);
-    /* return immediately if cmditem is an empty tree */
-    if (it == cmditem && it->cmd == NULL) {
-        return;
-    }
     while (it != NULL) {
         if ((it->prio == CMDITEM_IMPORTANT && is_set_important(args->flags)) ||
             (it->prio == CMDITEM_NORMAL && is_set_normal(args->flags)) ||
