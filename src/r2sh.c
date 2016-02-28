@@ -264,8 +264,10 @@ void delete_mode(struct listfile *listfile, struct args *args,
 void output_mode(struct listfile *listfile, struct args *args,
     struct cmditem *cmditem)
 {
+    struct cmditem *begin;
     struct cmditem *it;
     FILE *output;
+    int count = 0;
 
     if (args->text.out != NULL) {
         output = fopen(args->text.out, "w");
@@ -273,18 +275,29 @@ void output_mode(struct listfile *listfile, struct args *args,
         output = stdout;
     }
 
-    it = cmditem_begin(cmditem);
+    begin = cmditem_begin(cmditem);
+    it = begin;
     while (it != NULL) {
+        /* do if the command is set to check */
         if ((it->prio == CMDITEM_IMPORTANT && is_set_important(args->flags)) ||
             (it->prio == CMDITEM_NORMAL && is_set_normal(args->flags)) ||
             (it->prio == CMDITEM_EXTRA && is_set_extra(args->flags))) {
+            /* do if the command is not installed */
             if (check_command(it->cmd) != 0) {
-                fprintf(output, "%s ", it->cmd);
+                if (it != begin) {
+                    fprintf(output, " %s", it->cmd);
+                } else {
+                    fprintf(output, "%s", it->cmd);
+                }
+                count += 1;
             }
         }
         it = cmditem_next(it);
     }
-    fprintf(output, "\n");
+    /* do not add a newline if there's nothing to output */
+    if (count > 0) {
+        fprintf(output, "\n");
+    }
 }
 
 /*
