@@ -46,6 +46,7 @@ enum cmditem_error {
     CMDITEM_ERROR_NO_ERROR = 0,
     CMDITEM_ERROR_PARSE_ERROR = 1,
     CMDITEM_ERROR_NOT_ROOT = 2,
+    CMDITEM_ERROR_INVALID_VALUE = 3,
 };
 
 /**
@@ -70,6 +71,58 @@ void cmditem_init(struct cmditem *cmditem);
 int cmditem_parse_string(struct cmditem *cmditem, const char *str);
 
 /**
+ * int cmditem_set_cmd(struct cmditem *cmditem, const char *cmd)
+ *
+ * - parameters
+ * cmditem - the cmditem to set new cmd
+ * cmd - string that source of new cmd
+ *
+ * - description
+ * set cmditem->cmd with given null-terminated string `cmd`. new cmd is dynamic-
+ * allocated in the heap. if cmd already set before, it will be replaced with
+ * new `cmd` and the old one will be freed
+ *
+ * - return value
+ * CMDITEM_ERROR_NO_ERROR for success, CMDITEM_ERROR_INVALID_VALUE if `cmd` is
+ * not a proper string
+ */
+int cmditem_set_cmd(struct cmditem *cmditem, const char *cmd);
+
+/**
+ * int cmditem_set_prio(struct cmditem *cmditem, const char ch)
+ *
+ * - parameters
+ * cmditem - the cmditem to set new prio
+ * ch - character that valued 'i', 'n' or 'e'
+ *
+ * - description
+ * set cmditem->prio by refer to `ch`. if `ch` has proper value(see the
+ * parameters section), prio is set with matching enum(refer enum
+ * cmditem_priority).
+ *
+ * - return value
+ * CMDITEM_ERROR_NO_ERROR for success, CMDITEM_ERROR_INVALID_VALUE if `ch` has
+ * an invalid value
+ */
+int cmditem_set_prio(struct cmditem *cmditem, const char ch);
+
+/**
+ * int cmditem_set_desc(struct cmditem *cmditem, const char *desc)
+ *
+ * - parameters
+ * cmditem - the cmditem to set new desc
+ * desc - desc string
+ *
+ * - description
+ * set cmditem->desc with `desc` that null-terminated string.
+ *
+ * - return value
+ * CMDITEM_ERROR_NO_ERROR for success, if str is not valid string, then
+ * CMDITEM_ERROR_INVALID_VALUE will be returned
+ */
+int cmditem_set_desc(struct cmditem *cmditem, const char *desc);
+
+/**
  * int cmditem_append(struct cmditem *cmditem, struct cmditem *new_item)
  *
  * -parameters
@@ -78,7 +131,8 @@ int cmditem_parse_string(struct cmditem *cmditem, const char *str);
  *
  * - description
  * appending new_item to the cmditem inventory. `cmditem` should the root of
- * items
+ * items. be aware of that if the root is empty, data of `new_item` are copied
+ * to root item and `new_item` will be free, then it points the root item.
  *
  * - return value
  * CMDITEM_ERROR_NO_ERROR for no error. if `cmditem` is not the root of items,
@@ -168,5 +222,10 @@ static struct cmditem* grandparent(struct cmditem *item);
 
 /* non-member functions */
 int cmditem_to_prio(const char ch);
+int cmditem_str_to_prio(const char *str);
+/**
+ * char cmditem_ptoc(int) - prio to char
+ */
+char cmditem_ptoc(int prio);
 
 #endif /* _CMDITEM_H */

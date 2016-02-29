@@ -67,6 +67,47 @@ int cmditem_parse_string(struct cmditem *cmditem, const char *str)
     return CMDITEM_ERROR_NO_ERROR;
 }
 
+int cmditem_set_cmd(struct cmditem *cmditem, const char *cmd)
+{
+    if (cmd == NULL) {
+        return CMDITEM_ERROR_INVALID_VALUE;
+    }
+    if (cmditem->cmd != NULL) {
+        free(cmditem->cmd);
+    }
+    cmditem->cmd = (char*)malloc(sizeof(char) * (strlen(cmd) + 1));
+    strcpy(cmditem->cmd, cmd);
+
+    return CMDITEM_ERROR_NO_ERROR;
+}
+
+int cmditem_set_prio(struct cmditem *cmditem, const char ch)
+{
+    int prio;
+
+    prio = cmditem_to_prio(ch);
+    if (prio == -1) {
+        return CMDITEM_ERROR_INVALID_VALUE;
+    }
+    cmditem->prio = prio;
+
+    return CMDITEM_ERROR_NO_ERROR;
+}
+
+int cmditem_set_desc(struct cmditem *cmditem, const char *desc)
+{
+    if (desc == NULL) {
+        return CMDITEM_ERROR_INVALID_VALUE;
+    }
+    if (cmditem->desc != NULL) {
+        free(cmditem->desc);
+    }
+    cmditem->desc = (char*)malloc(sizeof(char) * (strlen(desc) + 1));
+    strcpy(cmditem->desc, desc);
+
+    return CMDITEM_ERROR_NO_ERROR;
+}
+
 int cmditem_append(struct cmditem *cmditem, struct cmditem *new_item)
 {
     struct cmditem *it;
@@ -75,6 +116,14 @@ int cmditem_append(struct cmditem *cmditem, struct cmditem *new_item)
     if (cmditem->parent != NULL) {
         /* parent of root is null */
         return CMDITEM_ERROR_NOT_ROOT;
+    }
+
+    /* the root is empty */
+    if (cmditem->cmd == NULL) {
+        *cmditem = *new_item;
+        free(new_item);
+        new_item = cmditem;
+        return CMDITEM_ERROR_NO_ERROR;
     }
 
     past_it = cmditem;
@@ -265,4 +314,47 @@ int cmditem_to_prio(const char ch)
     }
 
     return prio;
+}
+
+int cmditem_str_to_prio(const char *str)
+{
+    int prio;
+
+    switch (atoi(str)) {
+    case 0:
+        prio = CMDITEM_IMPORTANT;
+        break;
+    case 1:
+        prio = CMDITEM_NORMAL;
+        break;
+    case 2:
+        prio = CMDITEM_EXTRA;
+        break;
+    default:
+        prio = -1;
+        break;
+    }
+
+    return prio;
+}
+
+char cmditem_ptoc(int prio)
+{
+    char ch = 0;
+
+    switch (prio) {
+    case CMDITEM_IMPORTANT:
+        ch = 'i';
+        break;
+    case CMDITEM_NORMAL:
+        ch = 'n';
+        break;
+    case CMDITEM_EXTRA:
+        ch = 'e';
+        break;
+    default:
+        break;
+    }
+
+    return ch;
 }

@@ -73,13 +73,21 @@ void print_item(struct cmditem *item)
     }
 }
 
-void add_mode(struct listfile *listfile, struct args *args)
+void add_mode(struct listfile *listfile, struct args *args,
+    struct cmditem *cmditem)
 {
+    struct cmditem *new_item;
     char cmd_input[1024];
     char prio_input[3];
     char desc_input[2048];
+    int err;
+    int prio_new;
+    int is_wrong = 0;
     char *desc_auto;
-    struct listitem item;
+    char *new_line;
+
+    new_item = (struct cmditem*)malloc(sizeof(struct cmditem));
+    cmditem_init(new_item);
 
     /* check which argument is not passed and ask to input */
     if (args->text.cmd == NULL) {
@@ -89,55 +97,73 @@ void add_mode(struct listfile *listfile, struct args *args)
             printf("command: ");
             console_input_s(cmd_input, 1024);
         }
+        /* TODO: duplication check here */
         if (check_command(cmd_input) != 0) {
             printf("%s%s%s is not installed. if this is a misspelling, Ctrl + C to cancel.\n",
                 COLOR_BOLD, cmd_input, COLOR_RESET);
         }
-        args->text.cmd = cmd_input;
+        err = cmditem_set_cmd(new_item, cmd_input);
+    } else {
+        err = cmditem_set_cmd(new_item, args->text.cmd);
     }
-    if (args->text.prio == NULL) {
-        printf("priority [0: important / 1: normal / 2: extra]: (1) ");
-        console_input_s(prio_input, 2);
-        /* default is normal(1) */
-        if (strlen(prio_input) == 0) {
-            strcpy(prio_input, "1");
+
+    do {
+        /* use argument if argument passed and nothing wrong */
+        if (args->text.prio != NULL && is_wrong != 1) {
+            prio_new = cmditem_str_to_prio(args->text.prio);
         }
-        args->text.prio = prio_input;
-    }
+        /* get input if something wrong or no argument passed */
+        if (is_wrong == 1 || args->text.prio == NULL) {
+            printf("priority [0: important / 1: normal / 2: extra]: (1) ");
+            console_input_s(prio_input, 2);
+            /* default is normal(1) */
+            if (strlen(prio_input) == 0) {
+                strcpy(prio_input, "1");
+            }
+            prio_new = cmditem_str_to_prio(prio_input);
+        }
+        is_wrong = (prio_new == -1) ? 1 : 0;
+        if (is_wrong == 1) {
+            printf("priority only can be between 0 to 2\n");
+        }
+    } while (is_wrong == 1);
+    err = cmditem_set_prio(new_item, cmditem_ptoc(prio_new));
+
     if (args->text.desc == NULL) {
         /* get short description with whatis */
-        desc_auto = whatis_get(args->text.cmd);
-        if (desc_auto != NULL) {
-            printf("description: (%s) ", desc_auto);
-        } else {
-            printf("description: () ");
-        }
-        console_input_s(desc_input, 2048);
-        if (strlen(desc_input) == 0) {
-            /* use short description that automatically obtained or "" if not */
-            if (desc_auto != NULL) {
-                args->text.desc = desc_auto;
-            } else {
-                strcpy(desc_input, "");
-                args->text.desc = desc_input;
-            }
-        } else {
-            args->text.desc = desc_input;
-        }
-    }
-    printf("[%s] [%s] [%s]\n", args->text.cmd, args->text.prio, args->text.desc);
+        desc_auto = whatis_get(new_item->cmd);
 
-    listitem_init(&item);
-    item.cmd = args->text.cmd;
-    item.desc = args->text.desc;
-    if (args->text.prio[0] == '0') {
-        item.prio = LISTITEM_IMPORTANT;
-    } else if (args->text.prio[0] == '1') {
-        item.prio = LISTITEM_NORMAL;
-    } else if (args->text.prio[0] == '2') {
-        item.prio = LISTITEM_EXTRA;
+        printf("description: (%s) ", (desc_auto != NULL) ? desc_auto : "");
+        console_input_s(desc_input, 2048);
+        if ( (strlen(desc_input) == 0) && (desc_auto == NULL) ) {
+            /* keep null if nothing input or auto obtained */
+        } else if ( (strlen(desc_input) == 0) && (desc_auto != NULL) ){
+            /* use short description that automatically obtained */
+            err = cmditem_set_desc(new_item, desc_auto);
+        } else {
+            /* use user input */
+            err = cmditem_set_desc(new_item, desc_input);
+        }
+    } else {
+        err = cmditem_set_desc(new_item, args->text.desc);
     }
-    listfile_writeln(listfile, &item);
+    printf("[%s] [%d] [%s]\n", new_item->cmd, new_item->prio, new_item->desc);
+
+    cmditem_append(cmditem, new_item);
+    new_line = (char*)malloc(sizeof(char) * (
+        strlen(new_item->cmd) + 1 /* cmd size + tab */
+        + 1 + 1 /* prio size + tab */
+        + ((new_item->desc != NULL) ? strlen(new_item->desc) : 0) /* desc size*/
+        + 1)); /* null-character */
+    if (new_item->desc != NULL) {
+        sprintf(new_line, "%s\t%c\t%s",
+            new_item->cmd, cmditem_ptoc(new_item->prio), new_item->desc);
+    } else {
+        sprintf(new_line, "%s\t%c",
+            new_item->cmd, cmditem_ptoc(new_item->prio));
+    }
+    lines_append(listfile->lines, new_line);
+    new_item->line = listfile->lines->num;
 }
 
 void modify_mode(struct listfile *listfile, struct args *args,
@@ -397,7 +423,8 @@ int main(int argc, char *argv[])
     /* enter modifying mode if mode is add/edit */
     if (args->mode == ARGS_EDIT) {
         if (args->flags & FLAGS_ADD) {
-            add_mode(&listfile, args);
+            add_mode(&listfile, args, &cmditem);
+            listfile_write(&listfile, listfile_path);
         } else if (args->flags & FLAGS_MODIFY) {
             modify_mode(&listfile, args, &cmditem);
             listfile_write(&listfile, listfile_path);
