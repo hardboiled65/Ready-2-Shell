@@ -45,7 +45,7 @@ static const char* INFORMATION_HELP =
     "  -V, --version                 print r2sh version and exit\n";
 
 #ifdef R2SH_VERSION
-static const char* INFORMATION_VERSION = "Ready 2 Shell 0.3.0";
+static const char* INFORMATION_VERSION = "Ready 2 Shell 0.3.1";
 #else
 static const char* INFORMATION_VERSION = "development version";
 #endif /* R2SH_VERSION */
