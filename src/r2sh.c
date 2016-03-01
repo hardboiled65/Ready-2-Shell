@@ -110,7 +110,7 @@ void add_mode(struct listfile *listfile, struct args *args,
     do {
         /* use argument if argument passed and nothing wrong */
         if (args->text.prio != NULL && is_wrong != 1) {
-            prio_new = cmditem_str_to_prio(args->text.prio);
+            prio_new = cmditem_stop(args->text.prio);
         }
         /* get input if something wrong or no argument passed */
         if (is_wrong == 1 || args->text.prio == NULL) {
@@ -120,7 +120,7 @@ void add_mode(struct listfile *listfile, struct args *args,
             if (strlen(prio_input) == 0) {
                 strcpy(prio_input, "1");
             }
-            prio_new = cmditem_str_to_prio(prio_input);
+            prio_new = cmditem_stop(prio_input);
         }
         is_wrong = (prio_new == -1) ? 1 : 0;
         if (is_wrong == 1) {

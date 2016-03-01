@@ -9,6 +9,7 @@
 */
 #include "cmditem.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,7 +44,7 @@ int cmditem_parse_string(struct cmditem *cmditem, const char *str)
     for (; (str[i] == ' ') || (str[i] == '\t'); ++i) {
     }
     /* set priority */
-    if ( (cmditem->prio = cmditem_to_prio(str[i++])) == -1 ) {
+    if ( (cmditem->prio = cmditem_ctop(str[i++])) == -1 ) {
         return CMDITEM_ERROR_PARSE_ERROR;
     }
     /* discard spaces or tabs */
@@ -85,7 +86,7 @@ int cmditem_set_prio(struct cmditem *cmditem, const char ch)
 {
     int prio;
 
-    prio = cmditem_to_prio(ch);
+    prio = cmditem_ctop(ch);
     if (prio == -1) {
         return CMDITEM_ERROR_INVALID_VALUE;
     }
@@ -291,7 +292,7 @@ struct cmditem* grandparent(struct cmditem *item)
 }
 
 /* non-member functions */
-int cmditem_to_prio(const char ch)
+int cmditem_ctop(const char ch)
 {
     int prio;
 
@@ -316,7 +317,7 @@ int cmditem_to_prio(const char ch)
     return prio;
 }
 
-int cmditem_str_to_prio(const char *str)
+int cmditem_stop(const char *str)
 {
     int prio;
 
@@ -336,6 +337,18 @@ int cmditem_str_to_prio(const char *str)
     }
 
     return prio;
+}
+
+int cmditem_to_prio(const char ch)
+{
+    printf("cmditem_to_prio() is deprecated. use cmditem_ctop() instead.\n");
+    return cmditem_ctop(ch);
+}
+
+int cmditem_str_to_prio(const char *str)
+{
+    printf("cmditem_str_to_prio() is deprecated. use cmditem_stop() instead.\n");
+    return cmditem_stop(str);
 }
 
 char cmditem_ptoc(int prio)

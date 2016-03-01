@@ -221,6 +221,15 @@ static struct cmditem* nearest_greater_ancestor(struct cmditem *item);
 static struct cmditem* grandparent(struct cmditem *item);
 
 /* non-member functions */
+/**
+ * int cmditem_ctop(const char ch) - char to prio
+ */
+int cmditem_ctop(const char ch);
+/**
+ * int cmditem_stop(const char *str) - string to prio
+ */
+int cmditem_stop(const char *str);
+/* for backward-compatibility */
 int cmditem_to_prio(const char ch);
 int cmditem_str_to_prio(const char *str);
 /**
