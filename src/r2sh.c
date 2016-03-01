@@ -188,36 +188,31 @@ void modify_mode(struct listfile *listfile, struct args *args,
     }
     printf("command: (%s)\n", found->cmd);
     if (args->text.prio == NULL) {
+        /* read an input */
         printf("priority [0: important / 1: normal / 2: extra]: (%d) ",
                 found->prio);
         console_input_s(prio_input, 2);
+        /* if not ommitted */
         if (strcmp(prio_input, "") != 0) {
-            found->prio = atoi(prio_input);
+            prio_char = cmditem_stop(prio_input);
+            if (prio_char != -1) {
+                cmditem_set_prio(cmditem, prio_char);
+            }
         }
     } else {
-        found->prio = atoi(args->text.prio);
+        prio_char = cmditem_stop(args->text.prio);
+        if (prio_char != -1) {
+            cmditem_set_prio(cmditem, prio_char);
+        }
     }
     if (args->text.desc == NULL) {
         printf("description: (%s) ", found->desc);
         console_input_s(desc_input, 2048);
         if (strcmp(desc_input, "") != 0) {
-            // args->text.desc = desc_input;
-            if (cmditem->desc != NULL) {
-                free(cmditem->desc);
-                found->desc = NULL;
-            }
-            found->desc = (char*)malloc( (sizeof(char) * strlen(desc_input))
-                                            + 1 );
-            strcpy(found->desc, desc_input);
+            cmditem_set_desc(cmditem, desc_input);
         }
     } else {
-        if (found->desc != NULL) {
-            free(found->desc);
-            found->desc = NULL;
-        }
-        found->desc = (char*)malloc( (sizeof(char) * strlen(args->text.desc))
-                                        + 1 );
-        strcpy(found->desc, args->text.desc);
+        cmditem_set_desc(cmditem, args->text.desc);
     }
     printf("[%s] [%d] [%s]\n", found->cmd, found->prio, found->desc);
     new_str_len = strlen(found->cmd);
@@ -226,19 +221,7 @@ void modify_mode(struct listfile *listfile, struct args *args,
                       /* tab and desc if description exists */
     new_str_len += 1; /* null-char */
     new_str = (char*)malloc(sizeof(char) * new_str_len);
-    switch (found->prio) {
-    case CMDITEM_IMPORTANT:
-        prio_char = 'i';
-        break;
-    case CMDITEM_NORMAL:
-        prio_char = 'n';
-        break;
-    case CMDITEM_EXTRA:
-        prio_char = 'e';
-        break;
-    default:
-        break;
-    }
+    prio_char = cmditem_ptoc(found->prio);
     if (found->desc != NULL) {
         sprintf(new_str, "%s\t%c\t%s", found->cmd, prio_char, found->desc);
     } else {
