@@ -12,12 +12,12 @@
 #define _WHATIS_H
 
 #define WHATIS_SHELL_COMMAND    "command -v whatis >> /dev/null"
-#define WHATIS_FORMAT           "whatis %s >> /dev/null"
-/*                         20 -> |______  ____________| */
-#define WHATIS_FORMAT_LEN       20
+#define WHATIS_FORMAT           "whatis %s >/dev/null 2>/dev/null"
+/*                         30 -> |______  ______________________| */
+#define WHATIS_FORMAT_LEN       30
 #define WHATIS_SED_FORMAT       "whatis %s |head -1 |sed -r -e 's/.* - //'"
-/*                         38 -> |______  _______________________________| */
-#define WHATIS_SED_FORMAT_LEN   38
+/*                         39 -> |______  _______________________________| */
+#define WHATIS_SED_FORMAT_LEN   39
 
 /**
  * int whatis_is_installed() - check whatis command installed or not installed
