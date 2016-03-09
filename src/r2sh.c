@@ -97,7 +97,6 @@ void add_mode(struct listfile *listfile, struct args *args,
             printf("command: ");
             console_input_s(cmd_input, 1024);
         }
-        /* TODO: duplication check here */
         if (check_command(cmd_input) != 0) {
             printf("%s%s%s is not installed. if this is a misspelling, Ctrl + C to cancel.\n",
                 COLOR_BOLD, cmd_input, COLOR_RESET);
@@ -105,6 +104,12 @@ void add_mode(struct listfile *listfile, struct args *args,
         err = cmditem_set_cmd(new_item, cmd_input);
     } else {
         err = cmditem_set_cmd(new_item, args->text.cmd);
+    }
+    /* duplication check and return if already exists */
+    if (cmditem_find(cmditem, 
+        (args->text.cmd != NULL) ? args->text.cmd : cmd_input) != NULL) {
+        printf("that command is already in the list.\n");
+        return;
     }
 
     do {
