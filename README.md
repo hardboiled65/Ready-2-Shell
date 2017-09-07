@@ -17,15 +17,18 @@ Features
 
 Installation
 ------------
-We use [SCons](http://scons.org) for build project. You should install SCons before build Ready 2 Shell.
+Before install, make sure that the build tool is already installed.
+```sh
+$ make --version
+```
 For install this,
 ### Ubuntu (or other Debian based systems)
 ```sh
-$ sudo apt-get install scons
+$ sudo apt install build-essential
 ```
 For build,
 ```sh
-$ scons
+$ make
 $ sudo cp r2sh /usr/local/bin
 ```
 
