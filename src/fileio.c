@@ -36,7 +36,7 @@ int listfile_open(struct listfile *listfile, const char *filename)
     }
     free(default_path);
 
-    listfile->r_file = fopen(filename, "a+");
+    listfile->r_file = fopen(filename, "r");
 
     return LISTFILE_ERROR_NO_ERROR;
 }
