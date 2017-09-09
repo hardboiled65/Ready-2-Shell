@@ -204,25 +204,30 @@ void modify_mode(struct listfile *listfile, struct args *args,
         console_input_s(prio_input, 2);
         /* if not ommitted */
         if (strcmp(prio_input, "") != 0) {
-            prio_char = cmditem_stop(prio_input);
-            if (prio_char != CMDITEM_NO_PRIO) {
-                cmditem_set_prio(cmditem, prio_char);
+            prio_char = cmditem_ptoc(cmditem_stop(prio_input));
+            if (cmditem_ctop(prio_char) != CMDITEM_NO_PRIO) {
+                cmditem_set_prio(found, prio_char);
             }
+            /* TODO: add else condition for given prio is invalid */
+        } else {
+            /* using previous priority set */
+            prio_char = cmditem_ptoc(cmditem->prio);
         }
     } else {
-        prio_char = cmditem_stop(args->text.prio);
-        if (prio_char != CMDITEM_NO_PRIO) {
-            cmditem_set_prio(cmditem, prio_char);
+        prio_char = cmditem_ptoc(cmditem_stop(args->text.prio));
+        if (cmditem_ctop(prio_char) != CMDITEM_NO_PRIO) {
+            cmditem_set_prio(found, prio_char);
         }
+        /* TODO: add else condition for given prio is invalid */
     }
     if (args->text.desc == NULL) {
-        printf("description: (%s) ", found->desc);
+        printf("description: (%s) ", (found->desc != NULL) ? found->desc : "");
         console_input_s(desc_input, 2048);
         if (strcmp(desc_input, "") != 0) {
-            cmditem_set_desc(cmditem, desc_input);
+            cmditem_set_desc(found, desc_input);
         }
     } else {
-        cmditem_set_desc(cmditem, args->text.desc);
+        cmditem_set_desc(found, args->text.desc);
     }
     printf("[%s] [%d] [%s]\n", found->cmd, found->prio, found->desc);
     new_str_len = strlen(found->cmd);

@@ -310,7 +310,7 @@ int cmditem_ctop(const char ch)
         prio = CMDITEM_EXTRA;
         break;
     default:
-        prio = -1;
+        prio = CMDITEM_NO_PRIO;
         break;
     }
 
