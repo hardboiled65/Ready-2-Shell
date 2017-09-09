@@ -43,6 +43,7 @@ int listfile_readline(struct listfile *listfile, struct listitem *item);
 int listfile_write(struct listfile *listfile, const char *filename);
 int listfile_writeln(struct listfile *listfile, struct listitem *item);
 int listfile_close(struct listfile *listfile);
+int listfile_size(struct listfile *listfile);
 void listfile_free(struct listfile *listfile);
 
 /**
@@ -60,7 +61,10 @@ struct lines {
 };
 
 void lines_init(struct lines *lines);
+int lines_add(struct lines *lines,
+        const char *cmd, char prio, const char *desc);
 void lines_append(struct lines *lines, char *line_str);
+void lines_erase(struct lines *lines, int idx);
 void lines_free(struct lines *lines);
 
 /**

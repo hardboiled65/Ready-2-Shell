@@ -216,6 +216,11 @@ int listfile_close(struct listfile *listfile)
     return LISTFILE_ERROR_NO_ERROR;
 }
 
+int listfile_size(struct listfile *listfile)
+{
+    return listfile->lines->num;
+}
+
 void listfile_free(struct listfile *listfile)
 {
     if (listfile->r_file != NULL) {
@@ -242,6 +247,25 @@ void lines_init(struct lines *lines)
     lines->alloc_size = default_size;
 }
 
+int lines_add(struct lines *lines,
+        const char *cmd, char prio, const char *desc)
+{
+    char *new_line;
+
+    new_line = (char*)malloc(sizeof(char) * (
+        strlen(cmd) + 1 /* cmd size + tab */
+        + 1 + 1 /* prio size + tab */
+        + ((desc != NULL) ? strlen(desc) : 0) /* desc size*/
+        + 1)); /* null-character */
+    sprintf(new_line, (desc != NULL ? "%s\t%c\t%s" : "%s\t%c%s"),
+        cmd, prio, (desc != NULL ? desc : ""));
+
+    /* append the new line */
+    lines_append(lines, new_line);
+
+    return lines->num;
+}
+
 void lines_append(struct lines *lines, char *line_str)
 {
     char **new_data;
@@ -259,6 +283,12 @@ void lines_append(struct lines *lines, char *line_str)
         lines->data = new_data;
     }
     lines->num += 1;
+}
+
+void lines_erase(struct lines *lines, int idx)
+{
+    free(lines->data[idx]);
+    lines->data[idx] = NULL;
 }
 
 void lines_free(struct lines *lines)

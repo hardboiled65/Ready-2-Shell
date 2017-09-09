@@ -322,17 +322,17 @@ int cmditem_stop(const char *str)
     int prio;
 
     switch (atoi(str)) {
-    case 0:
+    case CMDITEM_IMPORTANT:
         prio = CMDITEM_IMPORTANT;
         break;
-    case 1:
+    case CMDITEM_NORMAL:
         prio = CMDITEM_NORMAL;
         break;
-    case 2:
+    case CMDITEM_EXTRA:
         prio = CMDITEM_EXTRA;
         break;
     default:
-        prio = -1;
+        prio = CMDITEM_NO_PRIO;
         break;
     }
 

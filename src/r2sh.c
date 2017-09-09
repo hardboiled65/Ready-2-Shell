@@ -39,6 +39,9 @@ void print_item(struct cmditem *item)
     char *circle_color;
     char *prio_str;
 
+    if (item->cmd == NULL)
+        return;
+
     if (item->prio == LISTITEM_IMPORTANT && is_set_important(flags)) {
         circle_color = COLOR_RED;
         prio_str = STRING_IMPORTANT;
@@ -51,9 +54,7 @@ void print_item(struct cmditem *item)
     } else {
         return;
     }
-    if (item->cmd == NULL) {
-        return;
-    }
+
     if (check_command(item->cmd) == 0) {
         if (is_set_verbose(flags)) {
             printf("%-12s  %s●%s %s%-9s%s --> %s[OK]           %s  %s\n",
@@ -80,6 +81,9 @@ void add_mode(struct listfile *listfile, struct args *args,
     char cmd_input[1024];
     char prio_input[3];
     char desc_input[2048];
+    const char *cmd;
+    const char *prio;
+    const char *desc;
     int err;
     int prio_new;
     int is_wrong = 0;
@@ -90,7 +94,7 @@ void add_mode(struct listfile *listfile, struct args *args,
     cmditem_init(new_item);
 
     /* check which argument is not passed and ask to input */
-    if (args->text.cmd == NULL) {
+    if (!args_is_set_cmd(args)) {
         printf("command: ");
         console_input_s(cmd_input, 1024);
         while (strlen(cmd_input) == 0) {
@@ -101,13 +105,14 @@ void add_mode(struct listfile *listfile, struct args *args,
             printf("%s%s%s is not installed. if this is a misspelling, Ctrl + C to cancel.\n",
                 COLOR_BOLD, cmd_input, COLOR_RESET);
         }
-        err = cmditem_set_cmd(new_item, cmd_input);
+        cmd = cmd_input;
     } else {
-        err = cmditem_set_cmd(new_item, args->text.cmd);
+        cmd = args->text.cmd;
     }
+    err = cmditem_set_cmd(new_item, cmd);
+
     /* duplication check and return if already exists */
-    if (cmditem_find(cmditem, 
-        (args->text.cmd != NULL) ? args->text.cmd : cmd_input) != NULL) {
+    if (cmditem_find(cmditem, cmd) != NULL) {
         printf("that command is already in the list.\n");
         return;
     }
@@ -127,7 +132,7 @@ void add_mode(struct listfile *listfile, struct args *args,
             }
             prio_new = cmditem_stop(prio_input);
         }
-        is_wrong = (prio_new == -1) ? 1 : 0;
+        is_wrong = (prio_new == CMDITEM_NO_PRIO) ? 1 : 0;
         if (is_wrong == 1) {
             printf("priority only can be between 0 to 2\n");
         }
@@ -155,19 +160,8 @@ void add_mode(struct listfile *listfile, struct args *args,
     printf("[%s] [%d] [%s]\n", new_item->cmd, new_item->prio, new_item->desc);
 
     cmditem_append(cmditem, new_item);
-    new_line = (char*)malloc(sizeof(char) * (
-        strlen(new_item->cmd) + 1 /* cmd size + tab */
-        + 1 + 1 /* prio size + tab */
-        + ((new_item->desc != NULL) ? strlen(new_item->desc) : 0) /* desc size*/
-        + 1)); /* null-character */
-    if (new_item->desc != NULL) {
-        sprintf(new_line, "%s\t%c\t%s",
-            new_item->cmd, cmditem_ptoc(new_item->prio), new_item->desc);
-    } else {
-        sprintf(new_line, "%s\t%c",
-            new_item->cmd, cmditem_ptoc(new_item->prio));
-    }
-    lines_append(listfile->lines, new_line);
+    lines_add(listfile->lines, new_item->cmd, cmditem_ptoc(new_item->prio),
+        new_item->desc);
     new_item->line = listfile->lines->num;
 }
 
@@ -200,13 +194,13 @@ void modify_mode(struct listfile *listfile, struct args *args,
         /* if not ommitted */
         if (strcmp(prio_input, "") != 0) {
             prio_char = cmditem_stop(prio_input);
-            if (prio_char != -1) {
+            if (prio_char != CMDITEM_NO_PRIO) {
                 cmditem_set_prio(cmditem, prio_char);
             }
         }
     } else {
         prio_char = cmditem_stop(args->text.prio);
-        if (prio_char != -1) {
+        if (prio_char != CMDITEM_NO_PRIO) {
             cmditem_set_prio(cmditem, prio_char);
         }
     }
@@ -242,7 +236,7 @@ void delete_mode(struct listfile *listfile, struct args *args,
     char cmd_input[1024];
     struct cmditem *found;
 
-    if (args->text.cmd == NULL) {
+    if (!args_is_set_cmd(args)) {
         printf("command: ");
         console_input_s(cmd_input, 1024);
         /* if input nothing, show input prompt again */
@@ -251,17 +245,15 @@ void delete_mode(struct listfile *listfile, struct args *args,
             console_input_s(cmd_input, 1024);
         }
     }
-    if (args->text.cmd == NULL) {
-        found = cmditem_find(cmditem, cmd_input);
-    } else {
-        found = cmditem_find(cmditem, args->text.cmd);
-    }
+    /* find the item to delete */
+    found = cmditem_find(cmditem,
+        (args_is_set_cmd(args) ? args->text.cmd : cmd_input));
     if (found == NULL) {
         printf("error: no such command\n");
         return;
     }
-    free(listfile->lines->data[found->line - 1]);
-    listfile->lines->data[found->line - 1] = NULL;
+    /* delete the item */
+    lines_erase(listfile->lines, found->line - 1);
     printf("deleted: [%s] [%d] [%s]\n", found->cmd, found->prio, found->desc);
     /* TODO: also delete from cmditem */
 }
@@ -282,22 +274,17 @@ void output_mode(struct listfile *listfile, struct args *args,
 
     begin = cmditem_begin(cmditem);
     it = begin;
-    while (it != NULL) {
+    for (it = begin; it != NULL; it = cmditem_next(it)) {
         /* do if the command is set to check */
         if ((it->prio == CMDITEM_IMPORTANT && is_set_important(args->flags)) ||
             (it->prio == CMDITEM_NORMAL && is_set_normal(args->flags)) ||
             (it->prio == CMDITEM_EXTRA && is_set_extra(args->flags))) {
             /* do if the command is not installed */
             if (check_command(it->cmd) != 0) {
-                if (it != begin) {
-                    fprintf(output, " %s", it->cmd);
-                } else {
-                    fprintf(output, "%s", it->cmd);
-                }
+                fprintf(output, (it != begin ? " %s" : "%s"), it->cmd);
                 count += 1;
             }
         }
-        it = cmditem_next(it);
     }
     /* do not add a newline if there's nothing to output */
     if (count > 0) {
@@ -357,7 +344,7 @@ int main(int argc, char *argv[])
     args = parse_args(argc, argv);
 
     /* print error and return error code when wrong position set */
-    if (args->wrong != -1) {
+    if (args_is_wrong(args)) {
         printf("%s: invalid option '%s'\n", argv[0], argv[args->wrong]);
         return 1;
     }
@@ -397,9 +384,10 @@ int main(int argc, char *argv[])
         return 1;
     }
     /* read file and parse that */
-    listfile_read(&listfile);
+    if (listfile_read(&listfile) != LISTFILE_ERROR_NO_ERROR)
+        return 1;
     cmditem_init(&cmditem);
-    for (i = 0; i < listfile.lines->num; ++i) {
+    for (i = 0; i < listfile_size(&listfile); ++i) {
         if ((listfile.lines->data[i] != NULL)
                 && (strlen(listfile.lines->data[i]) != 0)) {
             if (i == 0) { /* for root */

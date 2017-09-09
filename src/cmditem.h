@@ -24,7 +24,7 @@
  * cmd          command name
  * prio         priority (normal / important / extra)
  * desc         user description
- * line         actual line number in file
+ * line         actual line number in file. begins from 1
  */
 struct cmditem {
     struct cmditem *parent;
@@ -39,7 +39,8 @@ struct cmditem {
 enum cmditem_priority {
     CMDITEM_IMPORTANT = 0,
     CMDITEM_NORMAL = 1,
-    CMDITEM_EXTRA = 2
+    CMDITEM_EXTRA = 2,
+    CMDITEM_NO_PRIO = 3,
 };
 
 enum cmditem_error {

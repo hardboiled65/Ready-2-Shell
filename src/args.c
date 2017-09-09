@@ -45,6 +45,16 @@ void args_set_mode(struct args *args)
     }
 }
 
+int args_is_wrong(struct args *args)
+{
+    return (args->wrong != -1) ? 1 : 0;
+}
+
+int args_is_set_cmd(struct args *args)
+{
+    return (args->text.cmd != NULL) ? 1 : 0;
+}
+
 struct args* parse_args(int argc, char *argv[])
 {
     struct args *args = (struct args*)malloc(sizeof(struct args));

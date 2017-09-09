@@ -174,6 +174,8 @@ enum args_mode {
 
 void args_init(struct args *args);
 void args_set_mode(struct args *args);
+int args_is_wrong(struct args *args);
+int args_is_set_cmd(struct args *args);
 
 /**
  * struct args* parse_args(int, char**)
