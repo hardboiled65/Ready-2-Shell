@@ -101,9 +101,20 @@ void add_mode(struct listfile *listfile, struct args *args,
             printf("command: ");
             console_input_s(cmd_input, 1024);
         }
+        /* show warning if the command not installed */
         if (check_command(cmd_input) != 0) {
-            printf("%s%s%s is not installed. if this is a misspelling, Ctrl + C to cancel.\n",
-                COLOR_BOLD, cmd_input, COLOR_RESET);
+            if (!args_is_set_prio(args) || !args_is_set_desc(args)) {
+                /* show hint to cancel if there are further inputs */
+                printf(
+                    "%s%s%s is not installed. if this is a typing error,"
+                    " Ctrl + C to cancel.\n",
+                    COLOR_BOLD, cmd_input, COLOR_RESET);
+            } else {
+                /* show just warning if others already input */
+                printf(
+                    "%s%s%s is not installed. isn't this a typing error?\n",
+                    COLOR_BOLD, cmd_input, COLOR_RESET);
+            }
         }
         cmd = cmd_input;
     } else {
